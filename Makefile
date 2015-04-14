@@ -1,4 +1,8 @@
 
+OBJECTS = obj/loader.o obj/kmain.o
+CC = gcc
+CFLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
+-nostartfiles -nodefaultlibs -Wall -Wextra -Werror -c
 LDFLAGS = -T link.ld -melf_i386
 AS = nasm
 ASFLAGS = -f elf
@@ -18,13 +22,16 @@ os.iso: obj/kernel.elf
 		-o os.iso \
 		iso
 
-obj/kernel.elf: obj/loader.o
-	ld $(LDFLAGS) $< -o $@
+obj/kernel.elf: $(OBJECTS)
+	ld $(LDFLAGS) $^ -o $@
 
 run: os.iso
 	bochs -f bochsrc.txt -q
 
-obj/loader.o: src/loader.s
+obj/%.o: src/%.c
+	$(CC) $(CFLAGS) $< -o $@
+
+obj/%.o: src/%.s
 	$(AS) $(ASFLAGS) $< -o $@
 
 clean:
