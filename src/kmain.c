@@ -46,9 +46,22 @@ void screen_write_str(unsigned int i, unsigned int j, char *str, unsigned char f
         screen_write_char(i+k, j, str[k], fg, bg);
 }
 
+void outb(unsigned short port, unsigned char data);
+
+void fb_move_cursor(unsigned char i, unsigned char j)
+{
+    unsigned short pos = j*SCREEN_WIDTH + i;
+
+    outb(0x3D4, 14);
+    outb(0x3D5, ((pos >> 8) & 0x00FF));
+    outb(0x3D4, 15);
+    outb(0x3D5, pos & 0x00FF);
+}
+
 void kmain(void)
 {
     char str[14] = "hello world !";
 
     screen_write_str(0, 0, str, WHITE, BLACK);
+    fb_move_cursor(1, 1);
 }
