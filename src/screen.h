@@ -23,8 +23,15 @@
 #define LIGHT_BROWN     14
 #define WHITE           15
 
-void screen_write_char(uint8 j, uint8 i, char c, uint8 fg, uint8 bg);
-void screen_write_str(uint8 j, uint8 i, char *s, uint8 fg, uint8 bg);
-void screen_move_cursor(uint8 j, uint8 i);
+void outb(uint32 port, uint32 data);
+void _screen_write_char(uint8 j, uint8 i, char c, uint8 fg, uint8 bg);
+void _screen_move_cursor(uint8 j, uint8 i);
+
+void screen_write_char(char c);
+void screen_write_str(char *s);
+void screen_write_uint(uint32 n);
+void screen_write_int(int32 n);
+
+uint32 m_pow(uint32 n, uint32 p);
 
 #endif

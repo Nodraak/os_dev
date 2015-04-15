@@ -1,3 +1,4 @@
+[BITS 32]
 
 global loader
 global outb
