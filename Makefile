@@ -1,5 +1,5 @@
 
-OBJECTS = obj/loader.o obj/kmain.o obj/screen.o
+OBJECTS = obj/loader.o obj/io.o obj/kmain.o obj/kscreen.o
 CC = gcc
 CFLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
 -nostartfiles -nodefaultlibs -Wall -Wextra -Werror -c
