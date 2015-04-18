@@ -4,7 +4,8 @@
 
 void foo(void)
 {
-    char str[14] = "hello world !";
+    char str[] = "hello world !";
+    int i;
 
     screen_write_str(str);
     screen_write_char('\n');
@@ -16,17 +17,44 @@ void foo(void)
     screen_write_char('0'+sizeof(uint32));
     screen_write_char('\n');
 
-    int i;
-    for (i = 0; i < 100; ++i)
+    for (i = 0; i < 10; ++i)
     {
         screen_write_int(i);
         screen_write_char('\n');
     }
 }
 
-void kmain(void)
+void kmain(s_gdt *gdt)
 {
     screen_init();
+    uint8 *ptr = NULL, i;
+
+    screen_write_uint(gdt->size);
+    screen_write_char('\n');
+    screen_write_uint(gdt->address);
+    screen_write_char('\n');
+
+    screen_write_char('\n');
+    ptr = (uint8*)gdt;
+    ptr -= 32;
+
+    for (i = 0; i < 4; ++i)
+    {
+        screen_write_uhex(ptr[i*8+0]*256 + ptr[i*8+1]);
+        screen_write_char(' ');
+        screen_write_uhex(ptr[i*8+2]*256 + ptr[i*8+3]);
+        screen_write_char(' ');
+        screen_write_uhex(ptr[i*8+4]);
+        screen_write_char(' ');
+        screen_write_uhex(ptr[i*8+5]);
+        screen_write_char(' ');
+        screen_write_uhex(ptr[i*8+6]);
+        screen_write_char(' ');
+        screen_write_uhex(ptr[i*8+7]);
+
+        screen_write_char('\n');
+    }
+    screen_write_char('\n');
 
     foo();
 

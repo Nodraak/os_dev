@@ -1,9 +1,10 @@
 
 OBJECTS = obj/loader.o obj/io.o obj/kmain.o obj/kscreen.o
-CC = gcc
-CFLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
--nostartfiles -nodefaultlibs -Wall -Wextra -Werror -c
-LDFLAGS = -T link.ld -melf_i386
+CC = /opt/cross_os/bin/i686-elf-gcc
+CFLAGS = -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
+-nostartfiles -nodefaultlibs -Wall -Wextra -c
+LD = /opt/cross_os/bin/i686-elf-ld
+LDFLAGS = -T link.ld
 AS = nasm
 ASFLAGS = -f elf32
 
@@ -23,7 +24,7 @@ os.iso: obj/kernel.elf
 		iso
 
 obj/kernel.elf: $(OBJECTS)
-	ld $(LDFLAGS) $^ -o $@
+	$(LD) $(LDFLAGS) $^ -o $@
 
 run: os.iso
 	bochs -f bochsrc.txt -q

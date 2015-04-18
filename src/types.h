@@ -11,4 +11,10 @@ typedef unsigned char uint8;
 typedef unsigned short int uint16;
 typedef unsigned int uint32;
 
+typedef struct _s_gdt
+{
+    uint16 size;
+    uint32 address;
+} __attribute__((packed)) s_gdt;
+
 #endif

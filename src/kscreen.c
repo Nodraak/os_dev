@@ -107,8 +107,14 @@ void screen_write_str(char *s)
 
 void screen_write_uint(uint32 n)
 {
+    screen_write_unsigned_number(n, 10);
+}
+
+void screen_write_unsigned_number(uint32 n, uint32 base)
+{
     int8 nb_bits = 0, i;
     uint32 tmp = n;
+    char digits[] = "0123456789abcdef";
 
     if (n == 0)
     {
@@ -118,15 +124,23 @@ void screen_write_uint(uint32 n)
 
     while (tmp != 0)
     {
-        tmp /= 10;
+        tmp /= base;
         nb_bits ++;
     }
 
     for (i = nb_bits-1; i >= 0; --i)
     {
-        uint8 cur = (n/m_pow(10, i)) % 10;
-        screen_write_char('0' + cur);
+        uint8 cur = (n/m_pow(base, i)) % base;
+        screen_write_char(digits[cur]);
     }
+}
+
+void screen_write_uhex(uint32 n)
+{
+    screen_write_char('0');
+    screen_write_char('x');
+
+    screen_write_unsigned_number(n, 16);
 }
 
 void screen_write_int(int32 n)
