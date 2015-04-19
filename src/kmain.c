@@ -24,12 +24,66 @@ void foo(void)
     }
 }
 
+typedef struct
+{
+    uint32 access_byte;
+    uint32 eip;
+} __attribute__((packed)) vector_t;
+
+void getvect(vector_t *v, uint32 vect_num);
+void setvect(vector_t *v, uint32 vect_num);
+
+/* the layout of this structure must match the order of registers
+pushed and popped by the exception handlers in KSTART.ASM */
+typedef struct
+{
+/* pushed by pusha */
+    uint32 edi, esi, ebp, esp, ebx, edx, ecx, eax;
+/* pushed separately */
+    uint32 ds, es, fs, gs;
+    uint32 which_int, err_code;
+/* pushed by exception. Exception may also push err_code.
+user_esp and user_ss are pushed only if a privilege change occurs. */
+    uint32 eip, cs, eflags, user_esp, user_ss;
+} __attribute__((packed)) regs_t;
+
+void interrupt_handler(regs_t *regs)
+{
+    char msg1[] = "\thello from interrupt_handler\n";
+    screen_write_str(msg1);
+
+    char msg2[] = "\tinterrupt ";
+    screen_write_str(msg2);
+
+    screen_write_uhex(regs->which_int);
+
+    screen_write_char('\n');
+}
+
+#define INT_ID 0x20
+
 void kmain(s_gdt *gdt)
 {
     uint8 *ptr = NULL, i;
 
     char msg[] = "kmain\n";
     screen_write_str(msg);
+
+    vector_t v;
+
+    char msg2[] = "Installing new int handler\n";
+    screen_write_str(msg2);
+
+    v.eip = (uint32)interrupt_handler;
+    v.access_byte = 0x8E; /* present, ring 0, '386 interrupt gate */
+    setvect(&v, INT_ID);
+
+    char msg3[] = "Trying new int ...\n";
+    screen_write_str(msg3);
+    __asm__ __volatile__("int %0" : : "i"(INT_ID));
+
+    char msg4[] = "ok ! \\o/\n";
+    screen_write_str(msg4);
 
     screen_write_uint(gdt->size);
     screen_write_char('\n');
