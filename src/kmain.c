@@ -26,8 +26,10 @@ void foo(void)
 
 void kmain(s_gdt *gdt)
 {
-    screen_init();
     uint8 *ptr = NULL, i;
+
+    char msg[] = "kmain\n";
+    screen_write_str(msg);
 
     screen_write_uint(gdt->size);
     screen_write_char('\n');
