@@ -5,6 +5,7 @@ global getvect
 global setvect
 
 extern kmain
+extern kpic_remap
 extern screen_init
 
 MAGIC_NUMBER equ 0x1BADB002
@@ -61,6 +62,9 @@ do_idt:
     loop do_idt
 
     lidt [idt_ptr]
+
+; REMAP PIC
+    call kpic_remap
 
     sti
 ; KMAIN

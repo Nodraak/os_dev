@@ -71,6 +71,10 @@ void screen_write_char(char c)
         screen_x = 0;
         screen_y ++;
     }
+    else if (c == '\t')
+    {
+        screen_x += 4;
+    }
     else if (c == '\r')
     {
         screen_x = 0;

@@ -2,28 +2,6 @@
 #include "types.h"
 #include "kscreen.h"
 
-void foo(void)
-{
-    char str[] = "hello world !";
-    int i;
-
-    screen_write_str(str);
-    screen_write_char('\n');
-    screen_write_int((int)&str);
-    screen_write_char('\n');
-
-    screen_write_char('0'+sizeof(uint8));
-    screen_write_char('0'+sizeof(uint16));
-    screen_write_char('0'+sizeof(uint32));
-    screen_write_char('\n');
-
-    for (i = 0; i < 10; ++i)
-    {
-        screen_write_int(i);
-        screen_write_char('\n');
-    }
-}
-
 typedef struct
 {
     uint32 access_byte;
@@ -60,59 +38,116 @@ void interrupt_handler(regs_t *regs)
     screen_write_char('\n');
 }
 
-#define INT_ID 0x20
 
-void kmain(s_gdt *gdt)
+void outb(uint32 port, uint32 data);
+uint32 inb(uint32 port);
+
+#define PIC_MASTER_COMMAND  0x20
+#define PIC_MASTER_DATA     0x21
+#define PIC_SLAVE_COMMAND   0xA0
+#define PIC_SLAVE_DATA      0xA1
+
+#define PIC_ACK             0x20
+
+static inline void io_wait(void)
 {
-    uint8 *ptr = NULL, i;
+    /* TODO: This is probably fragile. */
+    asm volatile ( "jmp 1f\n\t"
+                   "1:jmp 2f\n\t"
+                   "2:" );
+}
+/* reinitialize the PIC controllers, giving them specified vector offsets
+   rather than 8h and 70h, as configured by default */
 
+#define ICW1_ICW4       0x01        /* ICW4 (not) needed */
+#define ICW1_SINGLE     0x02        /* Single (cascade) mode */
+#define ICW1_INTERVAL4  0x04        /* Call address interval 4 (8) */
+#define ICW1_LEVEL      0x08        /* Level triggered (edge) mode */
+#define ICW1_INIT       0x10        /* Initialization - required! */
+
+#define ICW4_8086       0x01        /* 8086/88 (MCS-80/85) mode */
+#define ICW4_AUTO       0x02        /* Auto (normal) EOI */
+#define ICW4_BUF_SLAVE  0x08        /* Buffered mode/slave */
+#define ICW4_BUF_MASTER 0x0C        /* Buffered mode/master */
+#define ICW4_SFNM       0x10        /* Special fully nested (not) */
+
+/*
+arguments:
+    offset1 - vector offset for master PIC
+        vectors on the master become offset1..offset1+7
+    offset2 - same for slave PIC: offset2..offset2+7
+*/
+void kpic_remap(void)
+{
+    char msg[] = "kpic_remap\n";
+    screen_write_str(msg);
+
+    outb(PIC_SLAVE_COMMAND, ICW1_INIT+ICW1_ICW4);       // starts the initialization sequence (in cascade mode)
+    io_wait();
+    outb(PIC_MASTER_COMMAND, ICW1_INIT+ICW1_ICW4);
+    io_wait();
+    outb(PIC_MASTER_DATA, PIC_MASTER_COMMAND);          // ICW2: Master PIC vector offset
+    io_wait();
+    outb(PIC_SLAVE_DATA, PIC_SLAVE_COMMAND);            // ICW2: Slave PIC vector offset
+    io_wait();
+    outb(PIC_MASTER_DATA, 4);                           // ICW3: tell Master PIC that there is a slave PIC at IRQ2 (0000 0100)
+    io_wait();
+    outb(PIC_SLAVE_DATA, 2);                            // ICW3: tell Slave PIC its cascade identity (0000 0010)
+    io_wait();
+
+    outb(PIC_MASTER_DATA, ICW4_8086);
+    io_wait();
+    outb(PIC_SLAVE_DATA, ICW4_8086);
+    io_wait();
+
+    /* disable all IRQs */
+    outb(PIC_MASTER_DATA, 0xFF);
+    outb(PIC_SLAVE_DATA, 0xFF);
+}
+
+void pic_ack(uchar irq)
+{
+    if (irq >= 8)
+        outb(PIC_SLAVE_COMMAND, PIC_ACK);
+
+    outb(PIC_MASTER_COMMAND, PIC_ACK);
+}
+
+#define IRQ_ID_KEYBOARD     0x01
+
+void irq_handler_keyboard(void)
+{
+    unsigned scan_code, temp;
+
+/* you MUST read port 60h to clear the keyboard interrupt */
+    scan_code = inb(0x60);
+    screen_write_uhex(scan_code);
+    screen_write_char('\n');
+    /*
+    temp = convert(scan_code);
+    if (temp != 0)
+        screen_write_char(temp);*/
+
+    pic_ack(IRQ_KEYBOARD);
+}
+
+void kmain(void)
+{
     char msg[] = "kmain\n";
     screen_write_str(msg);
 
     vector_t v;
 
-    char msg2[] = "Installing new int handler\n";
-    screen_write_str(msg2);
+    char msg1[] = "Installing keyboard interrupt handler ...\n";
+    screen_write_str(msg1);
 
-    v.eip = (uint32)interrupt_handler;
+    v.eip = (uint32)irq_handler_keyboard;
     v.access_byte = 0x8E; /* present, ring 0, '386 interrupt gate */
-    setvect(&v, INT_ID);
+    setvect(&v, 0x21);
+    outb(0x21, ~(1 << IRQ_KEYBOARD)); /* enable IRQ 1 (keyboard) (0x21 master) */
 
-    char msg3[] = "Trying new int ...\n";
+    char msg3[] = "Type some text\n";
     screen_write_str(msg3);
-    __asm__ __volatile__("int %0" : : "i"(INT_ID));
-
-    char msg4[] = "ok ! \\o/\n";
-    screen_write_str(msg4);
-
-    screen_write_uint(gdt->size);
-    screen_write_char('\n');
-    screen_write_uint(gdt->address);
-    screen_write_char('\n');
-
-    screen_write_char('\n');
-    ptr = (uint8*)gdt;
-    ptr -= 32;
-
-    for (i = 0; i < 4; ++i)
-    {
-        screen_write_uhex(ptr[i*8+0]*256 + ptr[i*8+1]);
-        screen_write_char(' ');
-        screen_write_uhex(ptr[i*8+2]*256 + ptr[i*8+3]);
-        screen_write_char(' ');
-        screen_write_uhex(ptr[i*8+4]);
-        screen_write_char(' ');
-        screen_write_uhex(ptr[i*8+5]);
-        screen_write_char(' ');
-        screen_write_uhex(ptr[i*8+6]);
-        screen_write_char(' ');
-        screen_write_uhex(ptr[i*8+7]);
-
-        screen_write_char('\n');
-    }
-    screen_write_char('\n');
-
-    foo();
 
     for (;;)
         ;
