@@ -1,40 +1,14 @@
 [BITS 32]
 
-global loader
+global gdt_init
+global idt_init
 global getvect
 global setvect
 
-extern kmain
-extern kpic_remap
-extern screen_init
-
-MAGIC_NUMBER equ 0x1BADB002
-FLAGS equ 0x0
-CHECKSUM equ -MAGIC_NUMBER
-
-KERNEL_STACK_SIZE equ 4096
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-section .bss
-    align 4
-
-kernel_stack:
-    resb KERNEL_STACK_SIZE
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-section .text:
-    align 4
-    dd MAGIC_NUMBER
-    dd FLAGS
-    dd CHECKSUM
-
-loader:
-    cli
-    call screen_init
 
 ; GDT : stop using bootloader GDT, and load new GDT
+gdt_init:
     lgdt  [gdt_ptr]
     ; Reload data segment registers
     mov ax, LINEAR_DATA_SEL ; new data selector
@@ -48,6 +22,7 @@ loader:
 flush_cs:
 
 ; IDT
+idt_init:
     ; set up interrupt handlers, then load IDT register
     mov ecx, (idt_end - idt_start) >> 3 ; number of exception handlers
     mov edi, idt_start
@@ -62,16 +37,6 @@ do_idt:
     loop do_idt
 
     lidt [idt_ptr]
-
-; REMAP PIC
-    call kpic_remap
-
-    sti
-; KMAIN
-    mov esp, kernel_stack + KERNEL_STACK_SIZE
-    push gdt_ptr
-    call kmain
-    jmp $
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -133,7 +98,6 @@ idt_end:
 idt_ptr:
     dw idt_end - idt_start - 1  ; IDT limit
     dd idt_start                ; linear adr of IDT
-
 
 ;
 ; IDT macro for interrupt handler

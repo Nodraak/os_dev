@@ -1,6 +1,6 @@
 
 #include "types.h"
-#include "kscreen.h"
+#include "screen.h"
 
 uint8 screen_x, screen_y, screen_fg, screen_bg;
 uint16 *screen_buffer;

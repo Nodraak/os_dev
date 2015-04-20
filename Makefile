@@ -1,5 +1,5 @@
 
-OBJECTS = obj/loader.o obj/io.o obj/kmain.o obj/kscreen.o
+OBJECTS = obj/boot.o obj/int_s.o obj/io.o obj/kmain.o obj/screen.o obj/int_c.o obj/keyboard.o
 CC = /opt/cross_os/bin/i686-elf-gcc
 CFLAGS = -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
 -nostartfiles -nodefaultlibs -Wall -Wextra -c
