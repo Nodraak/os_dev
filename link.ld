@@ -16,12 +16,7 @@ SECTIONS
     .text BLOCK(4K) : ALIGN(4K)
     {
         *(.text)
-    }
-
-    /* Read-only data. */
-    .rodata BLOCK(4K) : ALIGN(4K)
-    {
-        *(.rodata)
+        *(.rodata*)
     }
 
     /* Read-write data (initialized) */
@@ -33,8 +28,10 @@ SECTIONS
     /* Read-write data (uninitialized) and stack */
     .bss BLOCK(4K) : ALIGN(4K)
     {
+        _sbss = .;
         *(COMMON)
         *(.bss)
+        _ebss = .;
     }
 
     /* The compiler may produce other sections, by default it will put them in

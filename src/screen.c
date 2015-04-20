@@ -141,9 +141,7 @@ void screen_write_unsigned_number(uint32 n, uint32 base)
 
 void screen_write_uhex(uint32 n)
 {
-    screen_write_char('0');
-    screen_write_char('x');
-
+    screen_write_str("0x");
     screen_write_unsigned_number(n, 16);
 }
 

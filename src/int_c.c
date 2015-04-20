@@ -7,8 +7,7 @@
 
 void interrupt_handler(s_regs *regs)
 {
-    char msg1[] = "-> Received interrupt ";
-    screen_write_str(msg1);
+    screen_write_str("-> Received interrupt ");
     screen_write_uhex(regs->which_int);
     screen_write_char('\n');
 }
@@ -27,8 +26,7 @@ void pic_io_wait(void)
 */
 void pic_remap(void)
 {
-    char msg[] = "pic_remap\n";
-    screen_write_str(msg);
+    screen_write_str("pic_remap\n");
 
     outb(PIC_SLAVE_COMMAND, ICW1_INIT+ICW1_ICW4);       // starts the initialization sequence (in cascade mode)
     pic_io_wait();
