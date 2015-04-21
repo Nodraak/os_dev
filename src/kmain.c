@@ -5,13 +5,14 @@
 #include "int_c.h"
 #include "screen.h"
 #include "keyboard.h"
+#include "printf.h"
 
 
 void kmain(void)
 {
     s_vector v;
+    printf("Greetings from kmain() !\n");
 
-    screen_write_str("kmain\n");
     screen_write_str("Installing keyboard interrupt handler ...\n");
 
     v.eip = (uint32)kb_irq_handler;
@@ -19,7 +20,7 @@ void kmain(void)
     setvect(&v, 0x21);
     pic_irq_enable(IRQ_ID_KEYBOARD);
 
-    screen_write_str("Type some text\n");
+    printf("\nOS loaded !\n\n> ");
 
     for (;;)
         ;

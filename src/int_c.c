@@ -4,12 +4,11 @@
 #include "types.h"
 #include "io.h"
 #include "screen.h"
+#include "printf.h"
 
 void interrupt_handler(s_regs *regs)
 {
-    screen_write_str("-> Received interrupt ");
-    screen_write_uhex(regs->which_int);
-    screen_write_char('\n');
+    printf("-> Received interrupt %x\n", regs->which_int);
 }
 
 void pic_io_wait(void)
@@ -26,7 +25,7 @@ void pic_io_wait(void)
 */
 void pic_remap(void)
 {
-    screen_write_str("pic_remap\n");
+    printf("Remaping pic ...");
 
     outb(PIC_SLAVE_COMMAND, ICW1_INIT+ICW1_ICW4);       // starts the initialization sequence (in cascade mode)
     pic_io_wait();
@@ -49,6 +48,8 @@ void pic_remap(void)
     /* disable all IRQs */
     outb(PIC_MASTER_DATA, 0xFF);
     outb(PIC_SLAVE_DATA, 0xFF);
+
+    printf(" ok\n");
 }
 
 void pic_ack(uchar irq)
