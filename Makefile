@@ -2,7 +2,7 @@
 OBJECTS = obj/boot.o obj/gdt.o obj/idt.o obj/io.o obj/kmain.o obj/screen.o obj/pic.o obj/keyboard.o obj/printf.o
 CC = /opt/cross_os/bin/i686-elf-gcc
 CFLAGS = -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
--nostartfiles -nodefaultlibs -Wall -Wextra -c
+-nostartfiles -nodefaultlibs -Wall -Wextra -c -I inc
 LD = /opt/cross_os/bin/i686-elf-ld
 LDFLAGS = -T link.ld
 AS = nasm
