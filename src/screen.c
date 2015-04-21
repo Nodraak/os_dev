@@ -24,6 +24,8 @@ void screen_init(void)
     }
 
     _screen_move_cursor(screen_x, screen_y);
+
+    screen_write_str("Screen configured\n");
 }
 
 /*

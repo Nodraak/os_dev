@@ -5,10 +5,24 @@
 #include "io.h"
 #include "screen.h"
 #include "printf.h"
+#include "keyboard.h"
 
 void interrupt_handler(s_regs *regs)
 {
     printf("-> Received interrupt %x\n", regs->which_int);
+}
+
+void irq_install_kbd(void)
+{
+    s_vector v;
+    printf("Installing keyboard interrupt handler ...");
+
+    v.eip = (uint32)kb_irq_handler;
+    v.access_byte = 0x8E; /* present, ring 0, '386 interrupt gate */
+    setvect(&v, 0x21);
+    pic_irq_enable(IRQ_ID_KEYBOARD);
+
+    printf(" ok\n");
 }
 
 void pic_io_wait(void)

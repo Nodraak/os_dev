@@ -24,6 +24,7 @@
 #define ICW4_SFNM       0x10        /* Special fully nested (not) */
 
 void interrupt_handler(s_regs *regs);
+void irq_install_kbd(void);
 
 void pic_io_wait(void);
 void pic_remap(void);
