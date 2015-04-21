@@ -1,18 +1,17 @@
 
-#include "int_c.h"
-#include "int_s.h"
+#include "pic.h"
 #include "types.h"
-#include "io.h"
-#include "screen.h"
 #include "printf.h"
+#include "idt.h"
+#include "io.h"
 #include "keyboard.h"
 
-void interrupt_handler(s_regs *regs)
+void pic_interrupt_handler(s_regs *regs)
 {
     printf("-> Received interrupt %x\n", regs->which_int);
 }
 
-void irq_install_kbd(void)
+void pic_irq_install_kbd(void)
 {
     s_vector v;
     printf("Installing keyboard interrupt handler ...");

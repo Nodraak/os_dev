@@ -34,11 +34,5 @@ void _screen_scroll_up(void);
 
 void screen_write_char(char c);
 void screen_write_str(char *s);
-void screen_write_uint(uint32 n);
-void screen_write_unsigned_number(uint32 n, uint32 base);
-void screen_write_uhex(uint32 n);
-void screen_write_int(int32 n);
-
-uint32 m_pow(uint32 n, uint32 p);
 
 #endif

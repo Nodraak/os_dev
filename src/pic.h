@@ -2,7 +2,7 @@
 #define INT_C_H_INCLUDED
 
 #include "types.h"
-#include "int_s.h"
+#include "idt.h" /* s_regs */
 
 #define PIC_MASTER_COMMAND  0x20
 #define PIC_MASTER_DATA     0x21
@@ -23,8 +23,8 @@
 #define ICW4_BUF_MASTER 0x0C        /* Buffered mode/master */
 #define ICW4_SFNM       0x10        /* Special fully nested (not) */
 
-void interrupt_handler(s_regs *regs);
-void irq_install_kbd(void);
+void pic_interrupt_handler(s_regs *regs);
+void pic_irq_install_kbd(void);
 
 void pic_io_wait(void);
 void pic_remap(void);

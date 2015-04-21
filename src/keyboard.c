@@ -1,9 +1,8 @@
 
 #include "keyboard.h"
-#include "screen.h"
 #include "io.h"
-#include "int_c.h"
 #include "printf.h"
+#include "pic.h"
 
 void kb_irq_handler(void)
 {
@@ -54,5 +53,3 @@ uint32 kb_convert(uint32 code)
 
     return ret;
 }
-}
-

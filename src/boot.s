@@ -40,4 +40,3 @@ loader:
 ; KMAIN
     mov esp, kernel_stack + KERNEL_STACK_SIZE
     call kmain
-    jmp $
