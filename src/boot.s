@@ -24,11 +24,13 @@ kernel_stack:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-section .text:
-    align 4
+section .__mbHeader
+    align 0x4
     dd MAGIC_NUMBER
     dd FLAGS
     dd CHECKSUM
+
+section .text:
 
 loader:
     cli

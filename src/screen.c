@@ -1,6 +1,6 @@
 
-#include "types.h"
 #include "screen.h"
+#include "types.h"
 
 uint8 screen_x, screen_y, screen_fg, screen_bg;
 uint16 *screen_buffer;
@@ -105,8 +105,8 @@ void screen_write_char(char c)
 
 void screen_write_str(char *s)
 {
-    int i;
+    uint32 i;
 
-    for (i = 0; s[i] != NULL; ++i)
+    for (i = 0; s[i] != '\0'; ++i)
         screen_write_char(s[i]);
 }

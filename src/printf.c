@@ -2,6 +2,7 @@
 #include "printf.h"
 #include "types.h"
 #include "screen.h"
+#include "buffer.h"
 
 
 void printf(char *format, ...)
@@ -68,9 +69,9 @@ void printf(char *format, ...)
 
 uint32 printf_str(char *dest, char *src)
 {
-    int i;
+    uint32 i;
 
-    for (i = 0; src[i] != NULL; ++i)
+    for (i = 0; src[i] != '\0'; ++i)
         dest[i] = src[i];
 
     return i;
