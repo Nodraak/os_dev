@@ -31,13 +31,19 @@ void printf(char *format, ...)
                     i ++;
                     break;
                 case 'd':
-                    i += printf_int(&buf[i], va_arg(ap, int));
+                    i += printf_int(&buf[i], va_arg(ap, int32));
+                    break;
+                case 'u':
+                    i += printf_uint(&buf[i], va_arg(ap, uint32));
                     break;
                 case 's':
                     i += printf_str(&buf[i], va_arg(ap, char*));
                     break;
                 case 'x':
-                    i += printf_hex(&buf[i], va_arg(ap, int));
+                    i += printf_hex(&buf[i], va_arg(ap, int32));
+                    break;
+                case 'p':
+                    i += printf_hex(&buf[i], va_arg(ap, uint32)); /* sizeof(void*) == sizeof(int) */
                     break;
 
                 default:
@@ -105,6 +111,12 @@ uint32 printf_unsigned_number(char *s, uint32 n, uint32 base)
         uint8 cur = (n/m_pow(base, i)) % base;
         s[cur_char] = digits[cur];
         cur_char ++;
+
+        if (i % 3 == 0)
+        {
+            s[cur_char] = ' ';
+            cur_char ++;
+        }
     }
 
     return cur_char;

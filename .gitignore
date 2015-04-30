@@ -1,0 +1,6 @@
+obj/
+iso/boot/kernel.elf
+os.iso
+bochslog.txt
+
+Examples/
