@@ -7,7 +7,9 @@
 #include "gdt.h"
 #include "idt.h"
 
-s_buffer buffer_system;
+s_buffer buffer_system_stdin;
+s_buffer buffer_system_stdout;
+s_buffer buffer_system_serial;
 s_buffer buffer_shell;
 
 void shell(void)
@@ -18,17 +20,18 @@ void shell(void)
 
     while (!quit)
     {
-        int16 ret = buffer_pop_char(&buffer_system); /* todo getch */
+        int16 ret = buffer_pop_char(&buffer_system_stdin); /* todo getch */
 
         if (ret != EOF && ret != '\n')
         {
-            buffer_push_char(&buffer_shell, ret); /* todo local buffer */
+            buffer_push_char(&buffer_shell, ret);
             printf("%c", ret); /* todo : if echo */
-//            printf("%x-%c\n", scancode, c);
         }
         else if (ret == '\n')
         {
-            char *cmd = buffer_pop_str(&buffer_shell);
+            char cmd[1024];
+
+            buffer_pop_str(&buffer_shell, cmd);
     //        shell_execute_cmd(cmd)
 
             printf("\n\"%s\" : command not found.\n", cmd);
@@ -51,6 +54,11 @@ void kinit(void)
     printf(" ok\n");
     pic_remap();
     pic_irq_install_kbd();
+
+    buffer_init(&buffer_system_stdin);
+    buffer_init(&buffer_system_stdout);
+    buffer_init(&buffer_system_serial);
+    buffer_init(&buffer_shell);
 }
 
 void kmain(multiboot_info_t *mbi)

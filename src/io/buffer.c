@@ -26,30 +26,34 @@ char buffer_pop_char(s_buffer *b)
         return EOF;
 
     ret = b->data[0];
-    b->len --;
 
     for (i = 0; i < b->len; ++i)
         b->data[i] = b->data[i+1];
 
+    b->len --;
+
     return ret;
 }
 
-char *buffer_pop_str(s_buffer *b)
+void buffer_pop_str(s_buffer *b, char *buffer)
 {
-    uint32 len = 0, i;
-    char *ret = NULL;
+    uint32 i = 0;
 
-    /* ret str */
-    while (b->data[len] != '\n' && b->data[len] != '\0')
-        len ++;
-    str_move(ret, b->data, len);
-    ret[len] = '\0';
+    if (b->len == 0)
+    {
+        buffer[0] = '\0';
+        return;
+    }
 
-    /* move b->data to erase poped data */
-    for (; i < b->len-1; ++i)
-        b->data[i] = b->data[i+1];
+    for (;;)
+    {
+        char cur = buffer_pop_char(b);
+        if (cur == EOF || cur == '\0' || cur == '\n')
+            break;
 
-    b->len -= len;
+        buffer[i] = cur;
+        i ++;
+    }
 
-    return ret;
+    buffer[i] = '\0';
 }

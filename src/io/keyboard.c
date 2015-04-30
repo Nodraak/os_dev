@@ -5,7 +5,7 @@
 #include "pic.h"
 #include "buffer.h"
 
-extern s_buffer buffer_system;
+extern s_buffer buffer_system_stdin;
 
 void kb_irq_handler(void)
 {
@@ -18,7 +18,7 @@ void kb_irq_handler(void)
         c = kb_convert(scancode & 0x7F);
 
         if (c != 0)
-            buffer_push_char(&buffer_system, c);
+            buffer_push_char(&buffer_system_stdin, c);
     }
 
     pic_ack(IRQ_ID_KEYBOARD);
