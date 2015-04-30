@@ -39,6 +39,7 @@ void shell(void)
     }
 }
 
+#include "multiboot.h"
 
 void kinit(void)
 {
@@ -52,15 +53,28 @@ void kinit(void)
     pic_irq_install_kbd();
 }
 
-void kmain(void)
+void kmain(multiboot_info_t *mbi)
 {
     printf("\nGreetings from kmain() !\n");
 
     uint16 *ptr = (uint16*)0x0400;
-    printf("com1 %x\n", *ptr);
-    printf("com2 %x\n", *(ptr+1));
-    printf("com3 %x\n", *(ptr+2));
-    printf("com4 %x\n", *(ptr+3));
+    printf("Serial ports :\n");
+    printf("\tcom1 com2 com3 com4\n");
+    printf("\t%x %x %x %x\n", *ptr, *(ptr+1), *(ptr+2), *(ptr+3));
+
+    printf("mem_lower = %uKB, mem_upper = %uKB\n", mbi->mem_lower, mbi->mem_upper);
+
+    uint32 RAM_SIZE;
+    uint32 PAGE_SIZE;
+    uint32 NB_PAGES;
+
+    RAM_SIZE           = (mbi->mem_upper - mbi->mem_lower)*1024;
+    PAGE_SIZE          = 4*1024;
+    NB_PAGES           = RAM_SIZE/PAGE_SIZE;
+
+    printf("ram_size     %d\n", RAM_SIZE);
+    printf("page_size    %d\n", PAGE_SIZE);
+    printf("nb_page      %d\n", NB_PAGES);
 
     printf("\nOS loaded !\n");
 
