@@ -14,6 +14,8 @@ void shell(void)
 {
     uint8 quit = 0;
 
+    printf("> ");
+
     while (!quit)
     {
         int16 ret = buffer_pop_char(&buffer_system); /* todo getch */
@@ -41,18 +43,18 @@ void shell(void)
 void kinit(void)
 {
     screen_init();
+    serial_init();
     printf("Installing GDT and IDT ...");
     gdt_init();
     idt_init();
     printf(" ok\n");
     pic_remap();
-    serial_init();
     pic_irq_install_kbd();
 }
 
 void kmain(void)
 {
-    printf("Greetings from kmain() !\n");
+    printf("\nGreetings from kmain() !\n");
 
     uint16 *ptr = (uint16*)0x0400;
     printf("com1 %x\n", *ptr);
@@ -60,11 +62,11 @@ void kmain(void)
     printf("com3 %x\n", *(ptr+2));
     printf("com4 %x\n", *(ptr+3));
 
-    printf("\nOS loaded !\n\n> ");
+    printf("\nOS loaded !\n");
 
     for (;;)
     {
-        shell();
         printf("New shell spawning ...\n");
+        shell();
     }
 }
