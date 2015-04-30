@@ -1,5 +1,5 @@
-#ifndef INT_S_H_INCLUDED
-#define INT_S_H_INCLUDED
+#ifndef IDT_S_H_INCLUDED
+#define IDT_S_H_INCLUDED
 
 #include "types.h"
 
@@ -8,6 +8,8 @@ typedef struct _s_vector
     uint32 access_byte;
     uint32 eip;
 } __attribute__((packed)) s_vector;
+
+void idt_init(void);
 
 void getvect(s_vector *v, uint32 vect_num);
 void setvect(s_vector *v, uint32 vect_num);

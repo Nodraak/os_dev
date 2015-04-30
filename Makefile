@@ -1,10 +1,17 @@
 
-OBJECTS = obj/boot.o obj/gdt.o obj/idt.o obj/io.o obj/kmain.o obj/screen.o \
-	obj/pic.o obj/keyboard.o obj/printf.o obj/buffer.o obj/string.o obj/serial.o
+SUBDIR = descriptor_tables io x86
+
+_OBJECTS_DT = gdt.o idt.o pic.o
+_OBJECTS_IO = buffer.o keyboard.o printf.o screen.o serial.o
+_OBJECTS_X86 = boot.o io.o
+_OBJECTS_MAIN = kmain.o string.o
+
+_OBJECTS = $(addprefix descriptor_tables/, $(_OBJECTS_DT)) $(addprefix io/, $(_OBJECTS_IO)) $(addprefix x86/, $(_OBJECTS_X86)) $(_OBJECTS_MAIN)
+OBJECTS = $(addprefix obj/, $(_OBJECTS))
 
 CC = /opt/cross_os/bin/i686-elf-gcc
 CFLAGS = -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
-	-nostartfiles -nodefaultlibs -Wall -Wextra -c -I inc
+	-nostartfiles -nodefaultlibs -Wall -Wextra -c $(addprefix -I inc/ -I inc/, $(SUBDIR))
 
 LD = /opt/cross_os/bin/i686-elf-ld
 LDFLAGS = -T link.ld
@@ -12,7 +19,13 @@ LDFLAGS = -T link.ld
 AS = nasm
 ASFLAGS = -f elf32
 
-all: os.iso
+all: init os.iso
+
+init:
+	mkdir -p obj
+	mkdir -p obj/descriptor_tables
+	mkdir -p obj/io
+	mkdir -p obj/x86
 
 os.iso: obj/kernel.elf
 	cp obj/kernel.elf iso/boot/kernel.elf

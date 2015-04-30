@@ -1,5 +1,5 @@
-#ifndef INT_C_H_INCLUDED
-#define INT_C_H_INCLUDED
+#ifndef PIC_C_H_INCLUDED
+#define PIC_C_H_INCLUDED
 
 #include "types.h"
 #include "idt.h" /* s_regs */
