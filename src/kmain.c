@@ -2,7 +2,10 @@
 #include "pic.h"
 #include "printf.h"
 #include "buffer.h"
+#include "screen.h"
 #include "serial.h"
+#include "gdt.h"
+#include "idt.h"
 
 s_buffer buffer_system;
 s_buffer buffer_shell;
@@ -35,6 +38,18 @@ void shell(void)
 }
 
 
+void kinit(void)
+{
+    screen_init();
+    printf("Installing GDT and IDT ...");
+    gdt_init();
+    idt_init();
+    printf(" ok\n");
+    pic_remap();
+    serial_init();
+    pic_irq_install_kbd();
+}
+
 void kmain(void)
 {
     printf("Greetings from kmain() !\n");
@@ -44,11 +59,6 @@ void kmain(void)
     printf("com2 %x\n", *(ptr+1));
     printf("com3 %x\n", *(ptr+2));
     printf("com4 %x\n", *(ptr+3));
-
-    serial_init();
-    serial_write_str("Hello to serial !\n");
-
-    pic_irq_install_kbd();
 
     printf("\nOS loaded !\n\n> ");
 

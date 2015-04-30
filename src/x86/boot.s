@@ -2,11 +2,8 @@
 
 global loader
 
-extern gdt_init
-extern idt_init
-extern pic_remap
+extern kinit
 extern kmain
-extern screen_init
 
 MAGIC_NUMBER equ 0x1BADB002
 FLAGS equ 0x0
@@ -34,10 +31,7 @@ section .text:
 
 loader:
     cli
-    call screen_init
-    call gdt_init
-    call idt_init
-    call pic_remap
+    call kinit
     sti
 ; KMAIN
     mov esp, kernel_stack + KERNEL_STACK_SIZE

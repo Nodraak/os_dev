@@ -1,9 +1,12 @@
 
 #include "serial.h"
 #include "io.h"
+#include "printf.h"
 
 void serial_init(void)
 {
+    printf("Installing serial ...");
+
     outb(SERIAL_PORT_COM1 + 1, 0x00);    // Disable all interrupts
     outb(SERIAL_PORT_COM1 + 3, 0x80);    // Enable DLAB (set baud rate divisor)
     outb(SERIAL_PORT_COM1 + 0, 0x03);    // Set divisor to 3 (lo byte) 38400 baud
@@ -11,6 +14,8 @@ void serial_init(void)
     outb(SERIAL_PORT_COM1 + 3, 0x03);    // 8 bits, no parity, one stop bit
     outb(SERIAL_PORT_COM1 + 2, 0xC7);    // Enable FIFO, clear them, with 14-byte threshold
     outb(SERIAL_PORT_COM1 + 4, 0x0B);    // IRQs enabled, RTS/DSR set
+
+    printf(" ok\n");
 }
 
 int serial_received(void)
