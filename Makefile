@@ -1,6 +1,6 @@
 
 OBJECTS = obj/boot.o obj/gdt.o obj/idt.o obj/io.o obj/kmain.o obj/screen.o \
-	obj/pic.o obj/keyboard.o obj/printf.o obj/buffer.o obj/string.o
+	obj/pic.o obj/keyboard.o obj/printf.o obj/buffer.o obj/string.o obj/serial.o
 
 CC = /opt/cross_os/bin/i686-elf-gcc
 CFLAGS = -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
@@ -31,6 +31,7 @@ obj/kernel.elf: $(OBJECTS)
 	$(LD) $(LDFLAGS) $^ -o $@
 
 run: os.iso
+	rm -f serial.txt
 	bochs -f bochsrc.txt
 
 obj/%.o: src/%.c
@@ -40,7 +41,7 @@ obj/%.o: src/%.s
 	$(AS) $(ASFLAGS) $< -o $@
 
 clean:
-	rm -rf obj/* os.iso iso/boot/kernel.elf bochslog.txt
+	rm -rf obj/* os.iso iso/boot/kernel.elf bochslog.txt serial.txt
 
 re: clean all
 

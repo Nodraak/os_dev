@@ -2,6 +2,7 @@
 #include "pic.h"
 #include "printf.h"
 #include "buffer.h"
+#include "serial.h"
 
 s_buffer buffer_system;
 s_buffer buffer_shell;
@@ -37,6 +38,15 @@ void shell(void)
 void kmain(void)
 {
     printf("Greetings from kmain() !\n");
+
+    uint16 *ptr = (uint16*)0x0400;
+    printf("com1 %x\n", *ptr);
+    printf("com2 %x\n", *(ptr+1));
+    printf("com3 %x\n", *(ptr+2));
+    printf("com4 %x\n", *(ptr+3));
+
+    serial_init();
+    serial_write_str("Hello to serial !\n");
 
     pic_irq_install_kbd();
 

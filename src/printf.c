@@ -7,14 +7,21 @@
 
 void printf(char *format, ...)
 {
-    char *cur;
-    char buf[BUFFER_SIZE];
+    va_list args;
+    char buffer[1024];
+
+    va_start(args, format);
+    sprintf(format, args, buffer);
+
+    screen_write_str(buffer);
+}
+
+
+void sprintf(char *format, char *ap, char *buf)
+{
+    char *cur = format;
     uint32 i = 0;
-    va_list ap;
 
-    va_start(ap, format);
-
-    cur = format;
     while (*cur != '\0')
     {
         if (*cur == '%')
@@ -31,26 +38,26 @@ void printf(char *format, ...)
                     i ++;
                     break;
                 case 'd':
-                    i += printf_int(&buf[i], va_arg(ap, int32));
+                    i += sprintf_int(&buf[i], va_arg(ap, int32));
                     break;
                 case 'u':
-                    i += printf_uint(&buf[i], va_arg(ap, uint32));
+                    i += sprintf_uint(&buf[i], va_arg(ap, uint32));
                     break;
                 case 's':
-                    i += printf_str(&buf[i], va_arg(ap, char*));
+                    i += sprintf_str(&buf[i], va_arg(ap, char*));
                     break;
                 case 'x':
-                    i += printf_hex(&buf[i], va_arg(ap, int32));
+                    i += sprintf_hex(&buf[i], va_arg(ap, int32));
                     break;
                 case 'p':
-                    i += printf_hex(&buf[i], va_arg(ap, uint32)); /* sizeof(void*) == sizeof(int) */
+                    i += sprintf_hex(&buf[i], va_arg(ap, uint32)); /* sizeof(void*) == sizeof(int) */
                     break;
 
                 default:
-                    i += printf_str(&buf[i], "<error for mod ");
+                    i += sprintf_str(&buf[i], "<error sprintf ");
                     buf[i] = *cur;
                     i++;
-                    i += printf_str(&buf[i], ">");
+                    i += sprintf_str(&buf[i], ">");
                     break;
             }
         }
@@ -69,26 +76,20 @@ void printf(char *format, ...)
     }
 
     buf[i] = '\0';
-
-    screen_write_str(buf);
 }
 
-uint32 printf_str(char *dest, char *src)
+uint32 sprintf_str(char *dest, char *src)
 {
     uint32 i;
 
     for (i = 0; src[i] != '\0'; ++i)
         dest[i] = src[i];
 
+    dest[i] = '\0';
     return i;
 }
 
-uint32 printf_uint(char *s, uint32 n)
-{
-    return printf_unsigned_number(s, n, 10);
-}
-
-uint32 printf_unsigned_number(char *s, uint32 n, uint32 base)
+uint32 sprintf_unsigned_number(char *s, uint32 n, uint32 base)
 {
     int8 nb_bits = 0, i;
     uint32 tmp = n, cur_char = 0;
@@ -112,34 +113,40 @@ uint32 printf_unsigned_number(char *s, uint32 n, uint32 base)
         s[cur_char] = digits[cur];
         cur_char ++;
 
-        if (i % 3 == 0)
+        if (i != 0 && i % 3 == 0)
         {
             s[cur_char] = ' ';
             cur_char ++;
         }
     }
 
+    s[cur_char] = '\0';
     return cur_char;
 }
 
-uint32 printf_hex(char *s, uint32 n)
+uint32 sprintf_uint(char *s, uint32 n)
 {
-    s[0] = '0';
-    s[1] = 'x';
-    return 2 + printf_unsigned_number(s+2, n, 16);
+    return sprintf_unsigned_number(s, n, 10);
 }
 
-uint32 printf_int(char *s, int32 n)
+uint32 sprintf_int(char *s, int32 n)
 {
     if (n < 0)
     {
-        *s = '-';
-        return 1 + printf_uint(s+1, -n);
+        s[0] = '-';
+        return 1 + sprintf_uint(s+1, -n);
     }
     else
     {
-        return printf_uint(s, n);
+        return sprintf_uint(s, n);
     }
+}
+
+uint32 sprintf_hex(char *s, uint32 n)
+{
+    s[0] = '0';
+    s[1] = 'x';
+    return 2 + sprintf_unsigned_number(s+2, n, 16);
 }
 
 uint32 m_pow(uint32 n, uint32 p)
