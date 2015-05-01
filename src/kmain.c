@@ -6,41 +6,11 @@
 #include "serial.h"
 #include "gdt.h"
 #include "idt.h"
+#include "shell.h"
 
 s_buffer buffer_system_stdin;
 s_buffer buffer_system_stdout;
 s_buffer buffer_system_serial;
-s_buffer buffer_shell;
-
-void shell(void)
-{
-    uint8 quit = 0;
-
-    printf("> ");
-
-    while (!quit)
-    {
-        int16 ret = buffer_pop_char(&buffer_system_stdin); /* todo getch */
-
-        if (ret != EOF && ret != '\n')
-        {
-            buffer_push_char(&buffer_shell, ret);
-            printf("%c", ret); /* todo : if echo */
-        }
-        else if (ret == '\n')
-        {
-            char cmd[1024];
-
-            buffer_pop_str(&buffer_shell, cmd);
-    //        shell_execute_cmd(cmd)
-
-            printf("\n\"%s\" : command not found.\n", cmd);
-            printf("> "); /* todo : prompt ps1 */
-        }
-
-        // todo sleep
-    }
-}
 
 #include "multiboot.h"
 
@@ -58,7 +28,6 @@ void kinit(void)
     buffer_init(&buffer_system_stdin);
     buffer_init(&buffer_system_stdout);
     buffer_init(&buffer_system_serial);
-    buffer_init(&buffer_shell);
 }
 
 void kmain(multiboot_info_t *mbi)

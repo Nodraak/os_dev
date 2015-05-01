@@ -1,6 +1,7 @@
 
 #include "screen.h"
 #include "types.h"
+#include "serial.h"
 
 uint8 screen_x, screen_y, screen_fg, screen_bg;
 uint16 *screen_buffer;
@@ -75,7 +76,7 @@ void screen_write_char(char c)
     }
     else if (c == '\t')
     {
-        screen_x += 4;
+        screen_x += 4-screen_x%4;
     }
     else if (c == '\r')
     {
@@ -101,6 +102,8 @@ void screen_write_char(char c)
     }
 
     _screen_move_cursor(screen_y, screen_x);
+
+    serial_write_char(c);
 }
 
 void screen_write_str(char *s)

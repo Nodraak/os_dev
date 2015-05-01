@@ -1,12 +1,13 @@
 
-SUBDIR = descriptor_tables io x86
+SUBDIR = descriptor_tables io x86 shell
 
 _OBJECTS_DT = gdt.o idt.o pic.o
 _OBJECTS_IO = buffer.o keyboard.o printf.o screen.o serial.o
 _OBJECTS_X86 = boot.o io.o
+_OBJECTS_SHELL = shell.o
 _OBJECTS_MAIN = kmain.o string.o
 
-_OBJECTS = $(addprefix descriptor_tables/, $(_OBJECTS_DT)) $(addprefix io/, $(_OBJECTS_IO)) $(addprefix x86/, $(_OBJECTS_X86)) $(_OBJECTS_MAIN)
+_OBJECTS = $(addprefix descriptor_tables/, $(_OBJECTS_DT)) $(addprefix io/, $(_OBJECTS_IO)) $(addprefix x86/, $(_OBJECTS_X86)) $(addprefix shell/, $(_OBJECTS_SHELL)) $(_OBJECTS_MAIN)
 OBJECTS = $(addprefix obj/, $(_OBJECTS))
 
 CC = /opt/cross_os/bin/i686-elf-gcc
@@ -26,6 +27,7 @@ init:
 	mkdir -p obj/descriptor_tables
 	mkdir -p obj/io
 	mkdir -p obj/x86
+	mkdir -p obj/shell
 
 os.iso: obj/kernel.elf
 	cp obj/kernel.elf iso/boot/kernel.elf
