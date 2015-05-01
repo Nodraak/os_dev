@@ -24,7 +24,7 @@ void screen_init(void)
             _screen_write_char(j, i, ' ', screen_fg, screen_bg);
     }
 
-    _screen_move_cursor(screen_x, screen_y);
+    screen_move_cursor(screen_x, screen_y);
 
     screen_write_str("Screen configured\n");
 }
@@ -43,16 +43,6 @@ void _screen_write_char(uint8 j, uint8 i, char c, uint8 fg, uint8 bg)
     screen_buffer[j*SCREEN_WIDTH + i] = _screen_make_char(c, fg, bg);
 }
 
-void _screen_move_cursor(uint8 j, uint8 i)
-{
-    uint16 pos = j*SCREEN_WIDTH + i;
-
-    outb(0x3D4, 14);
-    outb(0x3D5, ((pos >> 8) & 0x00FF));
-    outb(0x3D4, 15);
-    outb(0x3D5, pos & 0x00FF);
-}
-
 void _screen_scroll_up(void)
 {
     uint8 i, j;
@@ -65,6 +55,23 @@ void _screen_scroll_up(void)
 
     for (i = 0; i < SCREEN_WIDTH; ++i)
         _screen_write_char(SCREEN_HEIGHT-1, i, ' ', COLOR_BLACK, COLOR_LIGHT_GREY);
+}
+
+void screen_move_cursor(uint8 j, uint8 i)
+{
+    uint16 pos = j*SCREEN_WIDTH + i;
+
+    outb(0x3D4, 14);
+    outb(0x3D5, ((pos >> 8) & 0x00FF));
+    outb(0x3D4, 15);
+    outb(0x3D5, pos & 0x00FF);
+
+    screen_y = j, screen_x = i;
+}
+
+uint16 screen_get_cursor(void)
+{
+    return ((screen_y << 8) | screen_x);
 }
 
 void screen_write_char(char c)
@@ -101,7 +108,7 @@ void screen_write_char(char c)
         screen_y --;
     }
 
-    _screen_move_cursor(screen_y, screen_x);
+    screen_move_cursor(screen_y, screen_x);
 
     serial_write_char(c);
 }

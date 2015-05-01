@@ -45,15 +45,15 @@ uint32 freq = 0;
 
 void timer_callback(void)
 {
-    char buf[1024];
-    uint32 i;
+    uint16 cursor;
 
     tick ++;
 
-    sprintf_uint(buf, tick);
-
-    for (i = 0; i < str_len(buf); ++i)
-        _screen_write_char(0, 60+i, buf[i], COLOR_BLUE, COLOR_LIGHT_GREY);
+    /* todo : grosse refacto, cursor pos + color + serial print */
+    cursor = screen_get_cursor();
+    screen_move_cursor(0, 70);
+    printf("%d", tick);
+    screen_move_cursor(cursor >> 8, cursor & 0xFF);
 
     pic_ack(IRQ_ID_TIMER);
 }
@@ -69,7 +69,7 @@ void timer_init(void)
     outb(0x43, 0x36);
 
     /* send the frequency divisor */
-    freq = 10;
+    freq = 1000;
     divisor = 1193180 / freq;
     outb(0x40, (divisor & 0xFF));
     outb(0x40, ((divisor >> 8) & 0xFF));
