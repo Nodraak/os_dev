@@ -23,15 +23,6 @@
 #define ICW4_BUF_MASTER 0x0C        /* Buffered mode/master */
 #define ICW4_SFNM       0x10        /* Special fully nested (not) */
 
-void pic_interrupt_handler(s_regs *regs);
-void pic_irq_install_kbd(void);
-
-void pic_io_wait(void);
-void pic_remap(void);
-void pic_ack(uchar irq);
-void pic_irq_enable(uint8 irq);
-void pic_irq_disable(uint8 irq);
-
 /*
     IRQ     Description
     0   Programmable Interrupt Timer Interrupt
@@ -54,5 +45,17 @@ void pic_irq_disable(uint8 irq);
     enable IRQ 0 (timer) and IRQ 1 (keyboard) (0x21 master / 0xA1 slave)
 */
 
+#define IRQ_ACCESS_BYTE     0x8E /* present, ring 0, '386 interrupt gate */
+#define IRQ_ID_KEYBOARD     0x01
+#define IRQ_VECT_KEYBOARD   0x21
+
+void pic_interrupt_handler(s_regs *regs);
+void pic_irq_install_kbd(void);
+
+void pic_io_wait(void);
+void pic_remap(void);
+void pic_ack(uchar irq);
+void pic_irq_enable(uint8 irq);
+void pic_irq_disable(uint8 irq);
 
 #endif

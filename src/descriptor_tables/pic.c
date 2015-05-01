@@ -17,8 +17,8 @@ void pic_irq_install_kbd(void)
     printf("Installing keyboard interrupt handler ...");
 
     v.eip = (uint32)kb_irq_handler;
-    v.access_byte = 0x8E; /* present, ring 0, '386 interrupt gate */
-    setvect(&v, 0x21);
+    v.access_byte = IRQ_ACCESS_BYTE;
+    setvect(&v, IRQ_VECT_KEYBOARD);
     pic_irq_enable(IRQ_ID_KEYBOARD);
 
     printf(" ok\n");
