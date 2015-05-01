@@ -8,6 +8,7 @@
 #include "idt.h"
 #include "shell.h"
 #include "paging_low.h"
+#include "timer.h"
 
 s_buffer buffer_system_stdin;
 s_buffer buffer_system_stdout;
@@ -26,6 +27,7 @@ void kinit(multiboot_info_t *mbi)
     pic_remap();
     pic_irq_install_kbd();
     paging_low_init(mbi);
+    timer_init();
 
     buffer_init(&buffer_system_stdin);
     buffer_init(&buffer_system_stdout);

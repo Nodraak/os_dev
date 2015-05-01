@@ -46,7 +46,11 @@
 */
 
 #define IRQ_ACCESS_BYTE     0x8E /* present, ring 0, '386 interrupt gate */
+
+#define IRQ_ID_TIMER        0x00
 #define IRQ_ID_KEYBOARD     0x01
+
+#define IRQ_VECT_TIMER      0x20
 #define IRQ_VECT_KEYBOARD   0x21
 
 void pic_interrupt_handler(s_regs *regs);
