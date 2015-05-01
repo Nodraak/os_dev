@@ -1,7 +1,9 @@
 #ifndef SERIAL_H_INCLUDED
 #define SERIAL_H_INCLUDED
 
-#define SERIAL_PORT_COM1    0x03F8
+#include "types.h"
+
+extern uint16 serial_port_com1;
 
 void serial_init(void);
 

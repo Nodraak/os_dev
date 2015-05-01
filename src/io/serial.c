@@ -3,24 +3,33 @@
 #include "io.h"
 #include "printf.h"
 
+uint16 serial_port_com1 = 0;
+
 void serial_init(void)
 {
-    printf("Installing serial ...");
+    uint16 *ptr = (uint16*)0x0400; /* bios defined addr for serial ports */
+    printf("Serial ports :\n");
+    printf("\tcom1 com2 com3 com4\n");
+    printf("\t%x %x %x %x\n", *ptr, *(ptr+1), *(ptr+2), *(ptr+3));
 
-    outb(SERIAL_PORT_COM1 + 1, 0x00);    // Disable all interrupts
-    outb(SERIAL_PORT_COM1 + 3, 0x80);    // Enable DLAB (set baud rate divisor)
-    outb(SERIAL_PORT_COM1 + 0, 0x03);    // Set divisor to 3 (lo byte) 38400 baud
-    outb(SERIAL_PORT_COM1 + 1, 0x00);    //                  (hi byte)
-    outb(SERIAL_PORT_COM1 + 3, 0x03);    // 8 bits, no parity, one stop bit
-    outb(SERIAL_PORT_COM1 + 2, 0xC7);    // Enable FIFO, clear them, with 14-byte threshold
-    outb(SERIAL_PORT_COM1 + 4, 0x0B);    // IRQs enabled, RTS/DSR set
+    serial_port_com1 = *ptr;
+
+    printf("Installing serial on com1=%x ...", serial_port_com1);
+
+    outb(serial_port_com1 + 1, 0x00);    // Disable all interrupts
+    outb(serial_port_com1 + 3, 0x80);    // Enable DLAB (set baud rate divisor)
+    outb(serial_port_com1 + 0, 0x03);    // Set divisor to 3 (lo byte) 38400 baud
+    outb(serial_port_com1 + 1, 0x00);    //                  (hi byte)
+    outb(serial_port_com1 + 3, 0x03);    // 8 bits, no parity, one stop bit
+    outb(serial_port_com1 + 2, 0xC7);    // Enable FIFO, clear them, with 14-byte threshold
+    outb(serial_port_com1 + 4, 0x0B);    // IRQs enabled, RTS/DSR set
 
     printf(" ok\n");
 }
 
 int serial_received(void)
 {
-    return inb(SERIAL_PORT_COM1 + 5) & 1;
+    return inb(serial_port_com1 + 5) & 1;
 }
 
 char serial_read(void)
@@ -28,20 +37,23 @@ char serial_read(void)
     while (serial_received() == 0)
         ;
 
-    return inb(SERIAL_PORT_COM1);
+    return inb(serial_port_com1);
 }
 
 int serial_can_write(void)
 {
-   return inb(SERIAL_PORT_COM1 + 5) & 0x20;
+   return inb(serial_port_com1 + 5) & 0x20;
 }
 
 void serial_write_char(char c)
 {
+    if (serial_port_com1 == 0) /* todo : if not serial_is_initialized */
+        return;
+
     while (serial_can_write() == 0)
         ;
 
-    outb(SERIAL_PORT_COM1, c);
+    outb(serial_port_com1, c);
 }
 
 void serial_write_str(char *s)
