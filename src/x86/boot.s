@@ -30,10 +30,11 @@ section .__mbHeader
 section .text:
 
 loader:
+    mov esp, kernel_stack + KERNEL_STACK_SIZE
+    push ebx    ; Push the pointer to the Multiboot information structure
     cli
     call kinit
     sti
 ; KMAIN
-    mov esp, kernel_stack + KERNEL_STACK_SIZE
-    push ebx    ; Push the pointer to the Multiboot information structure
     call kmain
+    jmp $
