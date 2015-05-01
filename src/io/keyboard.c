@@ -27,8 +27,8 @@ void kb_irq_handler(void)
 
 uint32 kb_convert(uint32 code)
 {
-    uchar ret;
-    uchar kbd_map[] = {
+    uint32 ret;
+    uint32 kbd_map[] = {
 /* 0x00 */
         0,      0,      '1',    '2',    '3',    '4',    '5',    '6',
         '7',    '8',    '9',    '0',    '-',    '=',    0,      '\t',
@@ -44,15 +44,16 @@ uint32 kb_convert(uint32 code)
 
     /* ignore invalid scan codes */
     if (code >= sizeof(kbd_map) / sizeof(kbd_map[0]))
-    {
-        printf("<scan code not found>");
-        return 0;
-    }
+        goto key_invalid;
 
     ret = kbd_map[code];
 
     if (ret == 0)
-        printf("<scan code not found>");
+        goto key_invalid;
 
     return ret;
+
+    key_invalid:
+        printf("<%x-%d>", code, code);
+        return 0;
 }

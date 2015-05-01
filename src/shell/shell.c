@@ -28,12 +28,12 @@ void shell(void)
             char cmd[1024];
 
             buffer_pop_str(&buffer_shell, cmd);
-    //        shell_execute_cmd(cmd)
+            /* todo : shell_execute_cmd(cmd) */
 
             printf("\n\"%s\" : command not found.\n", cmd);
             printf("> "); /* todo : prompt ps1 */
         }
 
-        // todo sleep
+        /* todo sleep */
     }
 }

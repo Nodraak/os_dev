@@ -12,7 +12,7 @@ OBJECTS = $(addprefix obj/, $(_OBJECTS))
 
 CC = /opt/cross_os/bin/i686-elf-gcc
 CFLAGS = -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
-	-nostartfiles -nodefaultlibs -Wall -Wextra -c $(addprefix -I inc/ -I inc/, $(SUBDIR))
+	-nostartfiles -nodefaultlibs -Wall -Wextra -pedantic -c $(addprefix -I inc/ -I inc/, $(SUBDIR))
 
 LD = /opt/cross_os/bin/i686-elf-ld
 LDFLAGS = -T link.ld

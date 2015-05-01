@@ -17,6 +17,7 @@ uint32 sprintf_unsigned_number(char *s, uint32 n, uint32 base);
 uint32 sprintf_uint(char *s, uint32 n);
 uint32 sprintf_int(char *s, int32 n);
 uint32 sprintf_hex(char *s, uint32 n);
+uint32 sprintf_binary(char *s, uint32 n);
 
 uint32 m_pow(uint32 n, uint32 p);
 

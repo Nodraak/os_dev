@@ -45,10 +45,8 @@ void kpannic(char *msg)
 
 void kmain(void)
 {
+    printf("OS loaded !\n");
     printf("\nGreetings from kmain() !\n");
-
-    /* done */
-    printf("\nOS loaded !\n");
 
     for (;;)
     {

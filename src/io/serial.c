@@ -7,7 +7,7 @@ uint16 serial_port_com1 = 0;
 
 void serial_init(void)
 {
-    uint16 *ptr = (uint16*)0x0400; /* bios defined addr for serial ports */
+    uint16 *ptr = (uint16*)0x0400;      /* bios defined addr for serial ports */
     printf("Serial ports :\n");
     printf("\tcom1 com2 com3 com4\n");
     printf("\t%x %x %x %x\n", *ptr, *(ptr+1), *(ptr+2), *(ptr+3));
@@ -16,13 +16,13 @@ void serial_init(void)
 
     printf("Installing serial on com1=%x ...", serial_port_com1);
 
-    outb(serial_port_com1 + 1, 0x00);    // Disable all interrupts
-    outb(serial_port_com1 + 3, 0x80);    // Enable DLAB (set baud rate divisor)
-    outb(serial_port_com1 + 0, 0x03);    // Set divisor to 3 (lo byte) 38400 baud
-    outb(serial_port_com1 + 1, 0x00);    //                  (hi byte)
-    outb(serial_port_com1 + 3, 0x03);    // 8 bits, no parity, one stop bit
-    outb(serial_port_com1 + 2, 0xC7);    // Enable FIFO, clear them, with 14-byte threshold
-    outb(serial_port_com1 + 4, 0x0B);    // IRQs enabled, RTS/DSR set
+    outb(serial_port_com1 + 1, 0x00);   /* Disable all interrupts */
+    outb(serial_port_com1 + 3, 0x80);   /* Enable DLAB (set baud rate divisor) */
+    outb(serial_port_com1 + 0, 0x03);   /* Set divisor to 3 (lo byte) 38400 baud */
+    outb(serial_port_com1 + 1, 0x00);   /*                  (hi byte) */
+    outb(serial_port_com1 + 3, 0x03);   /* 8 bits, no parity, one stop bit */
+    outb(serial_port_com1 + 2, 0xC7);   /* Enable FIFO, clear them, with 14-byte threshold */
+    outb(serial_port_com1 + 4, 0x0B);   /* IRQs enabled, RTS/DSR set */
 
     printf(" ok\n");
 }

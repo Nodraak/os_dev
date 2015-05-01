@@ -52,6 +52,9 @@ void sprintf(char *format, char *ap, char *buf)
                 case 'p':
                     i += sprintf_hex(&buf[i], va_arg(ap, uint32)); /* sizeof(void*) == sizeof(int) */
                     break;
+                case 'b':
+                    i += sprintf_binary(&buf[i], va_arg(ap, uint32));
+                    break;
 
                 default:
                     i += sprintf_str(&buf[i], "<error sprintf ");
@@ -147,6 +150,11 @@ uint32 sprintf_hex(char *s, uint32 n)
     s[0] = '0';
     s[1] = 'x';
     return 2 + sprintf_unsigned_number(s+2, n, 16);
+}
+
+uint32 sprintf_binary(char *s, uint32 n)
+{
+    return sprintf_unsigned_number(s, n, 2);
 }
 
 uint32 m_pow(uint32 n, uint32 p)

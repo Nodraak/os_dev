@@ -38,7 +38,7 @@ void str_move(char *dest, char *src, uint32 n)
     for (i = 0; i < len; ++i)
         dest[i] = buf[i];
 
-    // todo free buf
+    /* todo free buf */
 }
 
 /*
@@ -46,7 +46,7 @@ void str_move(char *dest, char *src, uint32 n)
    dest.  The memory areas must not overlap.  Use  memmove(3)  if  the  memory
    areas do overlap.
 */
-// todo memcpy
+/* todo memcpy */
 
 char *str_dup(char *s)
 {

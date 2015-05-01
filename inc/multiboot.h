@@ -125,7 +125,7 @@ typedef struct multiboot_info
     {
         multiboot_aout_symbol_table_t aout_sym;
         multiboot_elf_section_header_table_t elf_sec;
-    };
+    } _;
 
     /* Memory Mapping buffer */
     multiboot_uint32_t mmap_length;
@@ -153,6 +153,14 @@ typedef struct multiboot_info
     multiboot_uint16_t vbe_interface_len;
 } multiboot_info_t;
 
+/*
+    -4  size
+    0   base_addr_low
+    4   base_addr_high
+    8   length_low
+    12  length_high
+    16  type -> 1 == ok
+*/
 #define MB_MMAP_TYPE_AVAILABLE 1
 typedef struct multiboot_mmap_entry
 {

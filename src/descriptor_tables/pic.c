@@ -40,17 +40,17 @@ void pic_remap(void)
 {
     printf("Remaping pic ...");
 
-    outb(PIC_SLAVE_COMMAND, ICW1_INIT+ICW1_ICW4);       // starts the initialization sequence (in cascade mode)
+    outb(PIC_SLAVE_COMMAND, ICW1_INIT+ICW1_ICW4);   /* starts the initialization sequence (in cascade mode) */
     pic_io_wait();
     outb(PIC_MASTER_COMMAND, ICW1_INIT+ICW1_ICW4);
     pic_io_wait();
-    outb(PIC_MASTER_DATA, PIC_MASTER_COMMAND);          // ICW2: Master PIC vector offset
+    outb(PIC_MASTER_DATA, PIC_MASTER_COMMAND);      /* ICW2: Master PIC vector offset */
     pic_io_wait();
-    outb(PIC_SLAVE_DATA, PIC_SLAVE_COMMAND);            // ICW2: Slave PIC vector offset
+    outb(PIC_SLAVE_DATA, PIC_SLAVE_COMMAND);        /* ICW2: Slave PIC vector offset */
     pic_io_wait();
-    outb(PIC_MASTER_DATA, 4);                           // ICW3: tell Master PIC that there is a slave PIC at IRQ2 (0000 0100)
+    outb(PIC_MASTER_DATA, 4);                       /* ICW3: tell Master PIC that there is a slave PIC at IRQ2 (0000 0100) */
     pic_io_wait();
-    outb(PIC_SLAVE_DATA, 2);                            // ICW3: tell Slave PIC its cascade identity (0000 0010)
+    outb(PIC_SLAVE_DATA, 2);                        /* ICW3: tell Slave PIC its cascade identity (0000 0010) */
     pic_io_wait();
 
     outb(PIC_MASTER_DATA, ICW4_8086);
