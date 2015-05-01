@@ -30,6 +30,17 @@ void kinit(void)
     buffer_init(&buffer_system_serial);
 }
 
+void kpannic(char *msg)
+{
+    printf("\n**********************\n");
+    printf("=> Kernel pannic !! <=\n");
+    printf("Reason : %s\n", msg);
+    printf("\n**********************\n");
+
+    for (;;)
+        ;
+}
+
 void kmain(multiboot_info_t *mbi)
 {
     printf("\nGreetings from kmain() !\n");
