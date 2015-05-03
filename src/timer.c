@@ -1,4 +1,29 @@
 
+#include "types.h"
+#include "idt.h"
+#include "screen.h"
+#include "printf.h"
+#include "string.h"
+#include "pic.h"
+#include "io.h"
+#include "kmain.h"
+
+
+void timer_int_handler(void)
+{
+    char buffer[1024];
+    uint8 i;
+
+    kdata.timer_tick ++;
+
+    sprintf_uint(buffer, kdata.timer_tick);
+    for (i = 0; i < buffer[i]; ++i)
+        _screen_write_char(0, 70+i, buffer[i], COLOR_LIGHT_GREY, COLOR_BLUE);
+
+    pic_ack(IRQ_ID_TIMER);
+}
+
+
 /*
 
 Bits        Usage
@@ -31,33 +56,6 @@ Bits        Usage
     011 : mode 3
     0 : binary
 */
-
-#include "types.h"
-#include "idt.h"
-#include "screen.h"
-#include "printf.h"
-#include "string.h"
-#include "pic.h"
-#include "io.h"
-
-uint32 tick = 0;
-uint32 freq = 0;
-
-void timer_callback(void)
-{
-    uint16 cursor;
-
-    tick ++;
-
-    /* todo : grosse refacto, cursor pos + color + serial print */
-    cursor = screen_get_cursor();
-    screen_move_cursor(0, 70);
-    printf("%d", tick);
-    screen_move_cursor(cursor >> 8, cursor & 0xFF);
-
-    pic_ack(IRQ_ID_TIMER);
-}
-
 void timer_init(void)
 {
     uint16 freq, divisor;
@@ -74,7 +72,7 @@ void timer_init(void)
     outb(0x40, ((divisor >> 8) & 0xFF));
 
     /* enable interrupt handler */
-    pic_int_handler_install(timer_callback, IRQ_VECT_TIMER, IRQ_ID_TIMER);
+    pic_int_handler_install(timer_int_handler, IRQ_VECT_TIMER, IRQ_ID_TIMER);
 
     printf(" ok\n");
 }

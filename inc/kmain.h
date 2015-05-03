@@ -8,6 +8,8 @@ typedef struct _s_kdata
 {
     s_buffer buffer_stdin;
     uint16 serial_port_com1;
+
+    uint32 timer_tick;
 } s_kdata;
 
 extern s_kdata kdata;
