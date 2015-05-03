@@ -29,6 +29,7 @@ void kinit(multiboot_info_t *mbi)
     kb_int_handler_install();
     paging_low_init(mbi);
     timer_init();
+    shell_init();
 
     buffer_init(&kdata.buffer_stdin);
 }

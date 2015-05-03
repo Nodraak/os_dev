@@ -62,3 +62,19 @@ char *str_dup(char *s)
 
     return ret;
 }
+
+/* Compare S1 and S2, returning less than, equal to or
+   greater than zero if S1 is lexicographically less than,
+   equal to or greater than S2.  */
+int32 str_cmp(char *s1, char *s2)
+{
+    while (*s1 == *s2)
+    {
+        if (*s1 == '\0')
+            return *s1 - *s2;
+
+        s1 ++, s2 ++;
+    }
+
+    return *s1 - *s2;
+}
