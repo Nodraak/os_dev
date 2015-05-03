@@ -7,6 +7,13 @@
 typedef struct _s_kdata
 {
     s_buffer buffer_stdin;
+
+    uint8 screen_x;
+    uint8 screen_y;
+    uint8 screen_fg;
+    uint8 screen_bg;
+    uint16 *screen_ptr;
+
     uint16 serial_port_com1;
 
     uint32 timer_tick;

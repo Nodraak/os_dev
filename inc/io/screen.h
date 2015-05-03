@@ -5,7 +5,7 @@
 
 #define SCREEN_WIDTH    80
 #define SCREEN_HEIGHT   25
-#define SCREEN_ADDR     0xB8000
+#define SCREEN_ADDR     0x0B8000
 
 #define COLOR_BLACK           0
 #define COLOR_BLUE            1
@@ -28,8 +28,10 @@ void screen_init(void);
 
 uint16 _screen_make_char(char c, uint8 fg, uint8 bg);
 void _screen_write_char(uint8 j, uint8 i, char c, uint8 fg, uint8 bg);
-void _screen_move_cursor(uint8 j, uint8 i);
 void _screen_scroll_up(void);
+
+void screen_move_cursor(uint8 j, uint8 i);
+uint16 screen_get_cursor(void); /* return ((j << 8) | i); */
 
 void screen_write_char(char c);
 void screen_write_str(char *s);

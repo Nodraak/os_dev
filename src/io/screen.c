@@ -2,29 +2,24 @@
 #include "screen.h"
 #include "types.h"
 #include "serial.h"
+#include "io.h"
+#include "kmain.h"
 
-uint8 screen_x, screen_y, screen_fg, screen_bg;
-uint16 *screen_buffer;
-
-void outb(uint32 port, uint32 data);
 
 void screen_init(void)
 {
     uint8 i, j;
 
-    screen_x = 0;
-    screen_y = 0;
-    screen_fg = COLOR_BLACK;
-    screen_bg = COLOR_LIGHT_GREY;
-    screen_buffer = (uint16 *)SCREEN_ADDR;
+    screen_move_cursor(0, 0);
+    kdata.screen_fg = COLOR_BLACK;
+    kdata.screen_bg = COLOR_LIGHT_GREY;
+    kdata.screen_ptr = (uint16 *)SCREEN_ADDR;
 
     for (j = 0; j < SCREEN_HEIGHT-1; ++j)
     {
         for (i = 0; i < SCREEN_WIDTH; ++i)
-            _screen_write_char(j, i, ' ', screen_fg, screen_bg);
+            _screen_write_char(j, i, ' ', kdata.screen_fg, kdata.screen_bg);
     }
-
-    screen_move_cursor(screen_x, screen_y);
 
     screen_write_str("Screen configured\n");
 }
@@ -40,7 +35,7 @@ uint16 _screen_make_char(char c, uint8 fg, uint8 bg)
 
 void _screen_write_char(uint8 j, uint8 i, char c, uint8 fg, uint8 bg)
 {
-    screen_buffer[j*SCREEN_WIDTH + i] = _screen_make_char(c, fg, bg);
+    kdata.screen_ptr[j*SCREEN_WIDTH + i] = _screen_make_char(c, fg, bg);
 }
 
 void _screen_scroll_up(void)
@@ -50,7 +45,7 @@ void _screen_scroll_up(void)
     for (j = 0; j < SCREEN_HEIGHT-1; ++j)
     {
         for (i = 0; i < SCREEN_WIDTH; ++i)
-            screen_buffer[j*SCREEN_WIDTH + i] = screen_buffer[(j+1)*SCREEN_WIDTH + i];
+            kdata.screen_ptr[j*SCREEN_WIDTH + i] = kdata.screen_ptr[(j+1)*SCREEN_WIDTH + i];
     }
 
     for (i = 0; i < SCREEN_WIDTH; ++i)
@@ -66,49 +61,49 @@ void screen_move_cursor(uint8 j, uint8 i)
     outb(0x3D4, 15);
     outb(0x3D5, pos & 0x00FF);
 
-    screen_y = j, screen_x = i;
+    kdata.screen_y = j, kdata.screen_x = i;
 }
 
 uint16 screen_get_cursor(void)
 {
-    return ((screen_y << 8) | screen_x);
+    return ((kdata.screen_y << 8) | kdata.screen_x);
 }
 
 void screen_write_char(char c)
 {
     if (c == '\n')
     {
-        screen_x = 0;
-        screen_y ++;
+        kdata.screen_x = 0;
+        kdata.screen_y ++;
     }
     else if (c == '\t')
     {
-        screen_x += 4-screen_x%4;
+        kdata.screen_x += 4 - (kdata.screen_x % 4);
     }
     else if (c == '\r')
     {
-        screen_x = 0;
+        kdata.screen_x = 0;
     }
     else
     {
-        _screen_write_char(screen_y, screen_x, c, screen_fg, screen_bg);
+        _screen_write_char(kdata.screen_y, kdata.screen_x, c, kdata.screen_fg, kdata.screen_bg);
 
-        screen_x ++;
+        kdata.screen_x ++;
 
-        if (screen_x == SCREEN_WIDTH)
+        if (kdata.screen_x == SCREEN_WIDTH)
         {
-            screen_x = 0;
-            screen_y ++;
+            kdata.screen_x = 0;
+            kdata.screen_y ++;
         }
     }
 
-    if (screen_y == SCREEN_HEIGHT)
+    if (kdata.screen_y == SCREEN_HEIGHT)
     {
         _screen_scroll_up();
-        screen_y --;
+        kdata.screen_y --;
     }
 
-    screen_move_cursor(screen_y, screen_x);
+    screen_move_cursor(kdata.screen_y, kdata.screen_x);
 
     serial_write_char(c);
 }
