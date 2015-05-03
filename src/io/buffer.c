@@ -1,7 +1,6 @@
 
 #include "buffer.h"
 #include "types.h"
-#include "string.h"
 
 
 void buffer_init(s_buffer *b)

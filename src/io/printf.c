@@ -3,6 +3,7 @@
 #include "types.h"
 #include "screen.h"
 #include "buffer.h"
+#include "kmain.h"
 
 
 void printf(char *format, ...)
@@ -57,10 +58,8 @@ void sprintf(char *format, char *ap, char *buf)
                     break;
 
                 default:
-                    i += sprintf_str(&buf[i], "<error sprintf ");
-                    buf[i] = *cur;
+                    buf[i] = '?';
                     i++;
-                    i += sprintf_str(&buf[i], ">");
                     break;
             }
         }
@@ -96,7 +95,10 @@ uint32 sprintf_unsigned_number(char *s, uint32 n, uint32 base)
 {
     int8 nb_bits = 0, i;
     uint32 tmp = n, cur_char = 0;
-    char digits[] = "0123456789abcdef";
+    char digits[] = "0123456789ABCDEF";
+
+    if (base == 0 || base > 16)
+        kpannic("SPRINTF : invalid base");
 
     if (n == 0)
     {

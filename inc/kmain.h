@@ -7,6 +7,7 @@
 typedef struct _s_kdata
 {
     s_buffer buffer_stdin;
+    uint16 serial_port_com1;
 } s_kdata;
 
 extern s_kdata kdata;

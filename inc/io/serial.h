@@ -3,8 +3,6 @@
 
 #include "types.h"
 
-extern uint16 serial_port_com1;
-
 void serial_init(void);
 
 int serial_received(void);
