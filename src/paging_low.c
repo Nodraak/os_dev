@@ -3,6 +3,7 @@
 #include "types.h"
 #include "multiboot.h"
 #include "printf.h"
+#include "bitfield.h"
 
 uint8 *paging_low_table_addr;
 uint8 *paging_low_pages_addr;
@@ -76,4 +77,36 @@ void paging_low_init(multiboot_info_t *mbi)
     /* init page table : set to unused */
     for (i = 0; i < paging_low_pages_nb/8; ++i)
         paging_low_table_addr[i] = 0;
+}
+
+uint32 paging_alloc_pages(uint32 nb)
+{
+    uint32 i = 0, *ptr = NULL;
+
+    if (nb != 1)
+        kpannic("PAGING ALLOC : can't alloc other than one page");
+
+    for (i = 0; i < paging_low_pages_nb; ++i)
+    {
+        ptr = (uint32*)paging_low_table_addr;
+
+        if (bitfield_get(ptr[i/8], i%8) == 0)
+        {
+            bitfield_set(&ptr[i/8], i%8, 1);
+            return i;
+        }
+    }
+
+    kpannic("PAGING ALLOC : no free page found");
+    return 0; /* silent warning */
+}
+
+void paging_free_page(uint32 page_id)
+{
+    uint32 *ptr = (uint32*)paging_low_table_addr;
+
+    if (bitfield_get(ptr[page_id/8], page_id%8) == 0)
+        kpannic("PAGING FREE : page not in use");
+
+    bitfield_set(&ptr[page_id/8], page_id%8, 0);
 }
