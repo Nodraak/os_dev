@@ -4,18 +4,14 @@
 #include "multiboot.h"
 #include "printf.h"
 #include "bitfield.h"
+#include "kmain.h"
 
-uint8 *paging_low_table_addr;
-uint8 *paging_low_pages_addr;
-uint32 paging_low_pages_nb;
-
-void kpannic(char *msg);
 
 void paging_low_init(multiboot_info_t *mbi)
 {
     multiboot_memory_map_t *mmap = NULL;
-    uint32 mem_upper, mem_lower, i;
-    uint8 ok;
+    uint32 mem_upper = 0, mem_lower = 0, i = 0;
+    uint8 ok = 0;
 
     printf("Paging :\n");
 
@@ -31,12 +27,12 @@ void paging_low_init(multiboot_info_t *mbi)
     printf("\tPAGE_SIZE=%u\n", PAGE_SIZE);
 
     /* paging_low_pages_nb */
-    paging_low_pages_nb = mem_upper / PAGE_SIZE;
-    printf("\tpaging_low_pages_nb=%u\n", paging_low_pages_nb);
+    kdata.paging_low_pages_nb = mem_upper / PAGE_SIZE;
+    printf("\tpaging_low_pages_nb=%u\n", kdata.paging_low_pages_nb);
     printf("\tmem_lower=%u\n", mem_lower);
 
-    printf("\tSpace needed for page table=%u\n", paging_low_pages_nb/8);
-    if (paging_low_pages_nb/8 > mem_lower)
+    printf("\tSpace needed for page table=%u\n", kdata.paging_low_pages_nb/8);
+    if (kdata.paging_low_pages_nb/8 > mem_lower)
         kpannic("PAGING : no space for page table");
 
     /* paging_low_table_addr */
@@ -46,7 +42,7 @@ void paging_low_init(multiboot_info_t *mbi)
     {
         if (mmap->type == 1 && mmap->len_low == mem_lower)
         {
-            paging_low_table_addr = (uint8*)mmap->addr_low;
+            kdata.paging_low_table_addr = (uint8*)mmap->addr_low;
             ok ++;
         }
 
@@ -62,7 +58,7 @@ void paging_low_init(multiboot_info_t *mbi)
     {
         if (mmap->type == 1 && mmap->len_low == mem_upper)
         {
-            paging_low_pages_addr = (uint8*)mmap->addr_low;
+            kdata.paging_low_pages_addr = (uint8*)mmap->addr_low;
             ok ++;
         }
 
@@ -71,24 +67,27 @@ void paging_low_init(multiboot_info_t *mbi)
     if (ok != 1)
         kpannic("PAGING : paging_low_pages_addr not found");
 
-    printf("\tpaging_low_pages_addr=%u\n", (uint32)paging_low_pages_addr);
-    printf("\tRAM available=%u\n", PAGE_SIZE*paging_low_pages_nb);
+    printf("\tpaging_low_pages_addr=%u\n", (uint32)kdata.paging_low_pages_addr);
+    printf("\tRAM available=%u\n", PAGE_SIZE*kdata.paging_low_pages_nb);
 
     /* init page table : set to unused */
-    for (i = 0; i < paging_low_pages_nb/8; ++i)
-        paging_low_table_addr[i] = 0;
+    for (i = 0; i < kdata.paging_low_pages_nb/8; ++i)
+        kdata.paging_low_table_addr[i] = 0;
 }
 
 uint32 paging_alloc_pages(uint32 nb)
 {
     uint32 i = 0, *ptr = NULL;
 
-    if (nb != 1)
-        kpannic("PAGING ALLOC : can't alloc other than one page");
+    if (nb == 0)
+        return 0;
 
-    for (i = 0; i < paging_low_pages_nb; ++i)
+    if (nb != 1)
+        kpannic("PAGING ALLOC : can't alloc more than one page");
+
+    for (i = 0; i < kdata.paging_low_pages_nb; ++i)
     {
-        ptr = (uint32*)paging_low_table_addr;
+        ptr = (uint32*)kdata.paging_low_table_addr;
 
         if (bitfield_get(ptr[i/8], i%8) == 0)
         {
@@ -103,9 +102,9 @@ uint32 paging_alloc_pages(uint32 nb)
 
 void paging_free_page(uint32 page_id)
 {
-    uint32 *ptr = (uint32*)paging_low_table_addr;
+    uint32 *ptr = (uint32*)kdata.paging_low_table_addr;
 
-    if (bitfield_get(ptr[page_id/8], page_id%8) == 0)
+    if (bitfield_get(ptr[page_id/8], page_id%8) == 0 && page_id != 0)
         kpannic("PAGING FREE : page not in use");
 
     bitfield_set(&ptr[page_id/8], page_id%8, 0);
