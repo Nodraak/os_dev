@@ -6,7 +6,14 @@
 #include "buffer.h"
 #include "kmain.h"
 
-void kb_irq_handler(void)
+void kb_int_handler_install(void)
+{
+    printf("Installing keyboard interrupt handler ...");
+    pic_int_handler_install(kb_int_handler, IRQ_VECT_KEYBOARD, IRQ_ID_KEYBOARD);
+    printf(" ok\n");
+}
+
+void kb_int_handler(void)
 {
     uint32 scancode, c;
 

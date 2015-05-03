@@ -9,7 +9,6 @@ extern LINEAR_DATA_SEL
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; IDT
 idt_init:
     ; set up interrupt handlers, then load IDT register
     mov ecx, (idt_end - idt_start) >> 3 ; number of exception handlers
@@ -25,6 +24,7 @@ do_idt:
     loop do_idt
 
     lidt [idt_ptr]
+    ret
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

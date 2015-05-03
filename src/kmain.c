@@ -8,6 +8,7 @@
 #include "gdt.h"
 #include "idt.h"
 #include "pic.h"
+#include "keyboard.h"
 #include "paging_low.h"
 #include "timer.h"
 #include "buffer.h"
@@ -25,7 +26,7 @@ void kinit(multiboot_info_t *mbi)
     idt_init();
     printf(" ok\n");
     pic_remap();
-    pic_irq_install_kbd();
+    kb_int_handler_install();
     paging_low_init(mbi);
     timer_init();
 

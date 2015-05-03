@@ -9,12 +9,12 @@ MBH_MAGIC_NUMBER equ 0x1BADB002
 MBH_FLAGS equ 0x00000003
 MBH_CHECKSUM equ -(MBH_MAGIC_NUMBER + MBH_FLAGS)
 
-KERNEL_STACK_SIZE equ 4096
+KERNEL_STACK_SIZE equ 0x1000 ; 4096
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 section .bss
-    align 4
+    align 0x4
 
 kernel_stack:
     resb KERNEL_STACK_SIZE

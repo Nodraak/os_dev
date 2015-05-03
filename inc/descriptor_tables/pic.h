@@ -9,7 +9,7 @@
 #define PIC_SLAVE_COMMAND   0xA0
 #define PIC_SLAVE_DATA      0xA1
 
-#define PIC_ACK             0x20
+#define PIC_ACK_DATA        0x20
 
 #define ICW1_ICW4       0x01        /* ICW4 (not) needed */
 #define ICW1_SINGLE     0x02        /* Single (cascade) mode */
@@ -41,25 +41,21 @@
     13  FPU / Coprocessor / Inter-processor
     14  Primary ATA Hard Disk
     15  Secondary ATA Hard Disk
-
-    enable IRQ 0 (timer) and IRQ 1 (keyboard) (0x21 master / 0xA1 slave)
 */
 
 #define IRQ_ACCESS_BYTE     0x8E /* present, ring 0, '386 interrupt gate */
 
-#define IRQ_ID_TIMER        0x00
-#define IRQ_ID_KEYBOARD     0x01
-
 #define IRQ_VECT_TIMER      0x20
 #define IRQ_VECT_KEYBOARD   0x21
 
-void pic_interrupt_handler(s_regs *regs);
-void pic_irq_install_kbd(void);
+#define IRQ_ID_TIMER        0x00
+#define IRQ_ID_KEYBOARD     0x01
 
 void pic_io_wait(void);
 void pic_remap(void);
 void pic_ack(uchar irq);
 void pic_irq_enable(uint8 irq);
 void pic_irq_disable(uint8 irq);
+void pic_int_handler_install(void(*callback)(void), uint32 irq_vect, uint32 irq_id);
 
 #endif

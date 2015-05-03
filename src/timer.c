@@ -60,7 +60,6 @@ void timer_callback(void)
 
 void timer_init(void)
 {
-    s_vector v;
     uint16 freq, divisor;
 
     printf("Setting up the timer ...");
@@ -75,10 +74,7 @@ void timer_init(void)
     outb(0x40, ((divisor >> 8) & 0xFF));
 
     /* enable interrupt handler */
-    v.eip = (uint32)timer_callback;
-    v.access_byte = IRQ_ACCESS_BYTE;
-    setvect(&v, IRQ_VECT_TIMER);
-    pic_irq_enable(IRQ_ID_TIMER);
+    pic_int_handler_install(timer_callback, IRQ_VECT_TIMER, IRQ_ID_TIMER);
 
     printf(" ok\n");
 }

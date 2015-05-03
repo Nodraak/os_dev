@@ -4,7 +4,8 @@
 #include "types.h"
 
 
-void kb_irq_handler(void);
+void kb_int_handler_install(void);
+void kb_int_handler(void);
 uint32 kb_convert(uint32 code);
 
 #endif

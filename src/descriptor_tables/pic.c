@@ -6,27 +6,8 @@
 #include "io.h"
 #include "keyboard.h"
 
-void pic_interrupt_handler(s_regs *regs)
-{
-    printf("-> Received interrupt %x\n", regs->which_int);
-}
-
-void pic_irq_install_kbd(void)
-{
-    s_vector v;
-    printf("Installing keyboard interrupt handler ...");
-
-    v.eip = (uint32)kb_irq_handler;
-    v.access_byte = IRQ_ACCESS_BYTE;
-    setvect(&v, IRQ_VECT_KEYBOARD);
-    pic_irq_enable(IRQ_ID_KEYBOARD);
-
-    printf(" ok\n");
-}
-
 void pic_io_wait(void)
 {
-    /* TODO This is probably fragile. */
     asm volatile ( "jmp 1f\n\t"
                    "1:jmp 2f\n\t"
                    "2:" );
@@ -68,9 +49,9 @@ void pic_remap(void)
 void pic_ack(uchar irq)
 {
     if (irq >= 8)
-        outb(PIC_SLAVE_COMMAND, PIC_ACK);
+        outb(PIC_SLAVE_COMMAND, PIC_ACK_DATA);
 
-    outb(PIC_MASTER_COMMAND, PIC_ACK);
+    outb(PIC_MASTER_COMMAND, PIC_ACK_DATA);
 }
 
 void pic_irq_enable(uint8 irq)
@@ -105,4 +86,14 @@ void pic_irq_disable(uint8 irq)
         mask |= ~(1 << irq);
         outb(PIC_SLAVE_DATA, mask);
     }
+}
+
+void pic_int_handler_install(void(*callback)(void), uint32 irq_vect, uint32 irq_id)
+{
+    s_vector v;
+
+    v.eip = (uint32)callback;
+    v.access_byte = IRQ_ACCESS_BYTE;
+    setvect(&v, irq_vect);
+    pic_irq_enable(irq_id);
 }

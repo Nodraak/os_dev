@@ -4,11 +4,13 @@ global gdt_init
 global LINEAR_CODE_SEL
 global LINEAR_DATA_SEL
 
-; GDT : stop using bootloader GDT, and load new GDT
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+; stop using bootloader's GDT, and load a new GDT
 gdt_init:
     lgdt  [gdt_ptr]
-    ; Reload data segment registers
-    mov ax, LINEAR_DATA_SEL ; new data selector
+    ; Reload segment registers
+    mov ax, LINEAR_DATA_SEL
     mov ds, ax
     mov es, ax
     mov ss, ax
@@ -17,6 +19,9 @@ gdt_init:
     ; Reload CS register (code selector)
     jmp LINEAR_CODE_SEL:flush_cs
 flush_cs:
+    ret
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 section .data
 
@@ -46,11 +51,6 @@ LINEAR_DATA_SEL equ $-gdt_start
     db 0
 gdt_end:
 
-; struct gdt
-; {
-;     uint16 size;
-;     uint32 address;
-; } __attribute__((packed))
 gdt_ptr:
     dw gdt_end - gdt_start - 1
     dd gdt_start
