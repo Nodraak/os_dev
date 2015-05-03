@@ -1,20 +1,20 @@
 
-#include "pic.h"
+#include "kmain.h"
+
+#include "multiboot.h"
 #include "printf.h"
-#include "buffer.h"
 #include "screen.h"
 #include "serial.h"
 #include "gdt.h"
 #include "idt.h"
-#include "shell.h"
+#include "pic.h"
 #include "paging_low.h"
 #include "timer.h"
+#include "buffer.h"
+#include "shell.h"
 
-s_buffer buffer_system_stdin;
-s_buffer buffer_system_stdout;
-s_buffer buffer_system_serial;
+s_kdata kdata;
 
-#include "multiboot.h"
 
 void kinit(multiboot_info_t *mbi)
 {
@@ -29,9 +29,7 @@ void kinit(multiboot_info_t *mbi)
     paging_low_init(mbi);
     timer_init();
 
-    buffer_init(&buffer_system_stdin);
-    buffer_init(&buffer_system_stdout);
-    buffer_init(&buffer_system_serial);
+    buffer_init(&kdata.buffer_stdin);
 }
 
 void kpannic(char *msg)

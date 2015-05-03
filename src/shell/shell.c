@@ -3,8 +3,8 @@
 #include "types.h"
 #include "buffer.h"
 #include "printf.h"
+#include "kmain.h"
 
-extern s_buffer buffer_system_stdin;
 
 void shell(void)
 {
@@ -16,7 +16,7 @@ void shell(void)
 
     while (!quit)
     {
-        int16 ret = buffer_pop_char(&buffer_system_stdin); /* todo getch */
+        int16 ret = buffer_pop_char(&kdata.buffer_stdin); /* todo fgetc / fgets */
 
         if (ret != EOF && ret != '\n')
         {
