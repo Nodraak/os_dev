@@ -8,14 +8,13 @@
 void serial_init(void)
 {
     uint16 *ptr = (uint16*)0x0400;      /* bios defined addr for serial ports */
+
     printf("Serial ports :\n");
     printf("\tcom1 com2 com3 com4\n");
     printf("\t%x %x %x %x\n", *ptr, *(ptr+1), *(ptr+2), *(ptr+3));
-
-    kdata.serial_port_com1 = *ptr;
-
     printf("Installing serial on com1=%x ...", kdata.serial_port_com1);
 
+    kdata.serial_port_com1 = *ptr;
     outb(kdata.serial_port_com1 + 1, 0x00);   /* Disable all interrupts */
     outb(kdata.serial_port_com1 + 3, 0x80);   /* Enable DLAB (set baud rate divisor) */
     outb(kdata.serial_port_com1 + 0, 0x03);   /* Set divisor to 3 (lo byte) 38400 baud */

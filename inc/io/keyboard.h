@@ -3,6 +3,7 @@
 
 #include "types.h"
 
+#define KEY_BACKSPACE       0x0E
 
 void kb_int_handler_install(void);
 void kb_int_handler(void);

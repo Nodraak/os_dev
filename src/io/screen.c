@@ -21,7 +21,9 @@ void screen_init(void)
             _screen_write_char(j, i, ' ', kdata.screen_fg, kdata.screen_bg);
     }
 
-    screen_write_str("Screen configured\n");
+    for (i = 0; i < 16; ++i)
+        _screen_write_char(0, i, ' ', i, kdata.screen_fg);
+    screen_write_str("\nScreen configured\n");
 }
 
 /*

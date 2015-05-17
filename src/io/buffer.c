@@ -56,3 +56,18 @@ void buffer_pop_str(s_buffer *b, char *buffer)
 
     buffer[i] = '\0';
 }
+
+void buffer_backspace_char(s_buffer *b)
+{
+    b->len --;
+}
+
+void buffer_copy_str(s_buffer *b, char *s)
+{
+    uint32 i;
+
+    for (i = 0; i < b->len; ++i)
+        s[i] = b->data[i];
+
+    s[b->len] = '\0';
+}

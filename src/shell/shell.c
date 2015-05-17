@@ -5,6 +5,7 @@
 #include "printf.h"
 #include "string.h"
 #include "kmain.h"
+#include "keyboard.h"
 
 s_cmd cmd_data[3];
 uint8 cmd_nb;
@@ -42,6 +43,9 @@ void shell_execute_cmd(char *cmd)
 {
     uint8 i;
 
+    if (cmd[0] == '\0')
+        return;
+
     for (i = 0; i < cmd_nb; ++i)
     {
         if (str_cmp(cmd, cmd_data[i].name) == 0)
@@ -57,28 +61,39 @@ void shell_execute_cmd(char *cmd)
 
 void shell(void)
 {
-    uint8 quit = 0;
     s_buffer buffer_shell;
+    char ps1[1024] = "> ";
 
     buffer_init(&buffer_shell);
-    printf("> ");
+    printf("%s", ps1);
 
-    while (!quit)
+    for (;;)
     {
-        int16 ret = buffer_pop_char(&kdata.buffer_stdin); /* todo fgetc / fgets */
+        int16 ret = buffer_pop_char(&kdata.buffer_stdin);
 
         if (ret != EOF)
         {
-            buffer_push_char(&buffer_shell, ret);
-            printf("%c", ret); /* todo : if echo -> echo au niveu de l'os ; shell : juste un fgets */
-
-            if (ret == '\n')
+            if (ret == KEY_BACKSPACE)
             {
-                char cmd[1024];
+                char tmp[1024];
+                buffer_backspace_char(&buffer_shell);
+                buffer_copy_str(&buffer_shell, tmp);
+                printf("\r%s%s ", ps1, tmp);
+                printf("\r%s%s", ps1, tmp);
+            }
+            else
+            {
+                buffer_push_char(&buffer_shell, ret);
+                printf("%c", ret);
 
-                buffer_pop_str(&buffer_shell, cmd);
-                shell_execute_cmd(cmd);
-                printf("> "); /* todo : prompt ps1 */
+                if (ret == '\n')
+                {
+                    char cmd[1024];
+
+                    buffer_pop_str(&buffer_shell, cmd);
+                    shell_execute_cmd(cmd);
+                    printf("%s", ps1);
+                }
             }
         }
 

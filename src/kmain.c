@@ -29,8 +29,6 @@ void kinit(multiboot_info_t *mbi)
     kb_int_handler_install();
     paging_low_init(mbi);
     timer_init();
-    shell_init();
-
     buffer_init(&kdata.buffer_stdin);
 }
 
@@ -53,6 +51,7 @@ void kmain(void)
     for (;;)
     {
         printf("New shell spawning ...\n");
+        shell_init();
         shell();
     }
 }

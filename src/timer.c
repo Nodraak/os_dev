@@ -18,7 +18,7 @@ void timer_int_handler(void)
 
     sprintf_uint(buffer, kdata.timer_tick);
     for (i = 0; i < buffer[i]; ++i)
-        _screen_write_char(0, 70+i, buffer[i], COLOR_LIGHT_GREY, COLOR_BLUE);
+        _screen_write_char(0, 70+i, buffer[i], COLOR_BLUE, COLOR_LIGHT_GREY);
 
     pic_ack(IRQ_ID_TIMER);
 }
