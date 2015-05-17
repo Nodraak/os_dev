@@ -30,6 +30,7 @@ void kinit(multiboot_info_t *mbi)
     paging_low_init(mbi);
     timer_init();
     buffer_init(&kdata.buffer_stdin);
+    tasking_init();
 }
 
 void kpannic(char *msg)
@@ -47,6 +48,8 @@ void kmain(void)
 {
     printf("OS loaded !\n");
     printf("\nGreetings from kmain() !\n");
+
+    func1();
 
     for (;;)
     {
