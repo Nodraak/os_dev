@@ -13,6 +13,7 @@
 #include "timer.h"
 #include "buffer.h"
 #include "shell.h"
+#include "task.h"
 
 s_kdata kdata;
 
@@ -48,8 +49,6 @@ void kmain(void)
 {
     printf("OS loaded !\n");
     printf("\nGreetings from kmain() !\n");
-
-    func1();
 
     for (;;)
     {

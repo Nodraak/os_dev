@@ -18,7 +18,7 @@ typedef struct _s_task
 } s_task;
 
 void tasking_init(void);
-void tasking_create(s_task *task, void(*func)(void), uint32 flags, uint32 *pagedir, s_task *next);
+void tasking_create(s_task *task, void(*func)(void), s_task *next);
 void tasking_preempt(void); /* Switch task frontend */
 void tasking_switch(s_registers *old, s_registers *new); /* The ASM function which actually switches */
 
