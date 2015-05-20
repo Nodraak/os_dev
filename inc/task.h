@@ -3,18 +3,17 @@
 
 #include "types.h"
 
+#define TASK_MAX    5
+
 typedef struct _s_registers
 {
-    uint32 eax, ebx, ecx, edx;
-    uint32 esi, edi;
-    uint32 esp, ebp, eip;
-    uint32 eflags, cr3;
-} s_registers;
+    uint32 eax, ebx, ecx, edx, esi, edi, esp, ebp, eip, eflags, cr3;
+} __attribute__((packed)) s_registers;
 
 typedef struct _s_task
 {
     s_registers regs;
-    struct s_task *next;
+    struct _s_task *next;
 } s_task;
 
 void tasking_init(void);

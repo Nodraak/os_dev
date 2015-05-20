@@ -9,7 +9,7 @@
 #include "idt.h"
 #include "pic.h"
 #include "keyboard.h"
-#include "paging_low.h"
+#include "paging.h"
 #include "timer.h"
 #include "buffer.h"
 #include "shell.h"
@@ -20,17 +20,25 @@ s_kdata kdata;
 
 void kinit(multiboot_info_t *mbi)
 {
+    /* basic */
     screen_init();
     serial_init();
+
+    /* interrupts */
     printf("Installing GDT and IDT ...");
     gdt_init();
     idt_init();
     printf(" ok\n");
     pic_remap();
     kb_int_handler_install();
-    paging_low_init(mbi);
+
+    /* Memory */
+    page_frame_init(mbi);
+
+    /* misc */
     timer_init();
     buffer_init(&kdata.buffer_stdin);
+
     tasking_init();
 }
 

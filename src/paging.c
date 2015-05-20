@@ -1,5 +1,5 @@
 
-#include "paging_low.h"
+#include "paging.h"
 #include "types.h"
 #include "multiboot.h"
 #include "printf.h"
@@ -7,7 +7,7 @@
 #include "kmain.h"
 
 
-void paging_low_init(multiboot_info_t *mbi)
+void page_frame_init(multiboot_info_t *mbi)
 {
     multiboot_memory_map_t *mmap = NULL;
     uint32 mem_upper = 0, mem_lower = 0, i = 0;
@@ -75,7 +75,7 @@ void paging_low_init(multiboot_info_t *mbi)
         kdata.paging_low_table_addr[i] = 0;
 }
 
-uint32 paging_alloc_pages(uint32 nb)
+uint32 page_frame_alloc_pages_id(uint32 nb)
 {
     uint32 i = 0, *ptr = NULL;
 
@@ -100,7 +100,16 @@ uint32 paging_alloc_pages(uint32 nb)
     return 0; /* silent warning */
 }
 
-void paging_free_page(uint32 page_id)
+void *page_frame_alloc_pages_addr(uint32 size)
+{
+    uint32 page_id = 0;
+
+    page_id = page_frame_alloc_pages_id(size/PAGE_SIZE);
+
+    return (kdata.paging_low_pages_addr + page_id*PAGE_SIZE);
+}
+
+void page_frame_free_page_id(uint32 page_id)
 {
     uint32 *ptr = (uint32*)kdata.paging_low_table_addr;
 
@@ -108,4 +117,10 @@ void paging_free_page(uint32 page_id)
         kpannic("PAGING FREE : page not in use");
 
     bitfield_set(&ptr[page_id/8], page_id%8, 0);
+}
+
+void page_frame_free_page_addr(void *page_addr)
+{
+    uint32 page_id = ((uint8*)page_addr-kdata.paging_low_pages_addr) / PAGE_SIZE;
+    page_frame_free_page_id(page_id);
 }

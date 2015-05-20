@@ -5,18 +5,20 @@ _OBJECTS_DT = gdt.o idt.o pic.o
 _OBJECTS_IO = buffer.o keyboard.o printf.o screen.o serial.o
 _OBJECTS_X86 = boot.o io.o
 _OBJECTS_SHELL = shell.o
-_OBJECTS_MAIN = kmain.o string.o timer.o paging_low.o bitfield.o malloc.o task.o switch_att.o
+_OBJECTS_MAIN = kmain.o string.o timer.o paging.o bitfield.o malloc.o task.o switch_att.o
 
 _OBJECTS = $(addprefix descriptor_tables/, $(_OBJECTS_DT)) $(addprefix io/, $(_OBJECTS_IO)) $(addprefix x86/, $(_OBJECTS_X86)) $(addprefix shell/, $(_OBJECTS_SHELL)) $(_OBJECTS_MAIN)
 OBJECTS = $(addprefix obj/, $(_OBJECTS))
 
 CC = /opt/cross_os/bin/i686-elf-gcc
 CFLAGS = -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
-	-nostartfiles -nodefaultlibs -Wall -Wextra -pedantic -c $(addprefix -I inc/ -I inc/, $(SUBDIR))
+	-nostartfiles -nodefaultlibs -Wall -Wextra -c $(addprefix -I inc/ -I inc/, $(SUBDIR))
 
 LD = /opt/cross_os/bin/i686-elf-ld
 LDFLAGS = -T link.ld
 
+# at&t : as (gnu as) / masm
+# intel : nasm
 AS = nasm
 ASFLAGS = -f elf32
 

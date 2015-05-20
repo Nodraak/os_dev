@@ -2,43 +2,58 @@
 #include "task.h"
 #include "types.h"
 #include "malloc.h"
+#include "printf.h"
 
-s_task *runningTask;
-s_task task1;
-s_task task2;
+s_task tasks[TASK_MAX];
+s_task *task_running;
 
 uint32 task_flag;
 uint32 *task_pagedir;
 
+void debug(void)
+{
+    printf("-> from %d to %d\n", task_running-(&tasks[0])+1, task_running->next-(&tasks[0])+1);
+    printf("\n");
+}
+
+void func(int i)
+{
+    printf("[%d.1]\n", i);
+    tasking_preempt();
+    printf("[%d.2]\n", i);
+    //tasking_preempt();
+    //printf("[%d.3]\n", i);
+}
+
 void func1(void)
 {
-    printf("[1] Hello + Switching ...\n");
-    tasking_preempt();
-    printf("[1] Middle !\n");
-    tasking_preempt();
-    printf("[1] Returned !\n");
+    func(1);
 }
 
 void func2(void)
 {
-    printf("[2] Hello multitasking world !\n");
-    tasking_preempt();
-    printf("[2] Middle !\n");
-    tasking_preempt();
-    printf("[2] Returned !\n");
+    func(2);
+}
+
+void func3(void)
+{
+    func(3);
 }
 
 void tasking_init(void)
 {
     /* Get EFLAGS and CR3 */
-    asm volatile("movl %%cr3, %%eax; movl %%eax, %0;":"=m"(task_flag)::"%eax");
-    asm volatile("pushfl; movl (%%esp), %%eax; movl %%eax, %0; popfl;":"=m"(task_pagedir)::"%eax");
+    asm volatile("movl %%cr3, %%eax; movl %%eax, %0;":"=m"(task_pagedir)::"%eax");
+    asm volatile("pushfl; movl (%%esp), %%eax; movl %%eax, %0; popfl;":"=m"(task_flag)::"%eax");
+
+    printf("pagedir=%p flags=%d\n", task_pagedir, task_flag);
 
     /* create a few tasks */
-    tasking_create(&task1, func1, &task2);
-    tasking_create(&task2, func2, &task1);
+    tasking_create(&tasks[0], func1, &tasks[1]);
+    tasking_create(&tasks[1], func2, &tasks[0]);
+    //tasking_create(&tasks[2], func3, &tasks[0]);
 
-    runningTask = &task1;
+    task_running = &tasks[0];
     func1();
 }
 
@@ -59,10 +74,11 @@ void tasking_create(s_task *task, void(*func)(void), s_task *next)
 
 void tasking_preempt(void)
 {
-    s_task *old = NULL, *new = NULL;
+    s_task *old = NULL;
 
-    old = runningTask;
-    new = old->next;
-    runningTask = new;
-    tasking_switch(&old->regs, &new->regs);
+    debug();
+
+    old = task_running;
+    task_running = task_running->next;
+    tasking_switch(&old->regs, &task_running->regs);
 }

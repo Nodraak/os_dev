@@ -4,10 +4,12 @@
 #include "types.h"
 #include "multiboot.h"
 
-#define PAGE_SIZE (4*1024)
+#define PAGE_SIZE 0x1000 /* 4 KiB */
 
-void paging_low_init(multiboot_info_t *mbi);
-uint32 paging_alloc_pages(uint32 nb);
-void paging_free_page(uint32 page_id);
+void page_frame_init(multiboot_info_t *mbi);
+uint32 page_frame_alloc_pages_id(uint32 nb);
+void *page_frame_alloc_pages_addr(uint32 size);
+void page_frame_free_page_id(uint32 page_id);
+void page_frame_free_page_addr(void *page_addr);
 
 #endif
