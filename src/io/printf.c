@@ -91,7 +91,7 @@ uint32 sprintf_str(char *dest, char *src)
     return i;
 }
 
-uint32 sprintf_unsigned_number(char *s, uint32 n, uint32 base)
+uint32 sprintf_unsigned_number(char *s, uint32 n, uint32 base, uint8 group_by)
 {
     int8 nb_bits = 0, i;
     uint32 tmp = n, cur_char = 0;
@@ -118,10 +118,13 @@ uint32 sprintf_unsigned_number(char *s, uint32 n, uint32 base)
         s[cur_char] = digits[cur];
         cur_char ++;
 
-        if (i != 0 && i % 3 == 0)
+        if (group_by)
         {
-            s[cur_char] = ' ';
-            cur_char ++;
+            if (i != 0 && i % group_by == 0)
+            {
+                s[cur_char] = ' ';
+                cur_char ++;
+            }
         }
     }
 
@@ -131,7 +134,7 @@ uint32 sprintf_unsigned_number(char *s, uint32 n, uint32 base)
 
 uint32 sprintf_uint(char *s, uint32 n)
 {
-    return sprintf_unsigned_number(s, n, 10);
+    return sprintf_unsigned_number(s, n, 10, 3);
 }
 
 uint32 sprintf_int(char *s, int32 n)
@@ -151,12 +154,12 @@ uint32 sprintf_hex(char *s, uint32 n)
 {
     s[0] = '0';
     s[1] = 'x';
-    return 2 + sprintf_unsigned_number(s+2, n, 16);
+    return 2 + sprintf_unsigned_number(s+2, n, 16, 0);
 }
 
 uint32 sprintf_binary(char *s, uint32 n)
 {
-    return sprintf_unsigned_number(s, n, 2);
+    return sprintf_unsigned_number(s, n, 2, 4);
 }
 
 uint32 m_pow(uint32 n, uint32 p)

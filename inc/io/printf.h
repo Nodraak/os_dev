@@ -13,7 +13,7 @@ void printf(char *format, ...) __attribute__ ((format (printf, 1, 2)));
 
 void sprintf(char *format, char *ap, char *dest);
 uint32 sprintf_str(char *dest, char *src);
-uint32 sprintf_unsigned_number(char *s, uint32 n, uint32 base);
+uint32 sprintf_unsigned_number(char *s, uint32 n, uint32 base, uint8 group_by);
 uint32 sprintf_uint(char *s, uint32 n);
 uint32 sprintf_int(char *s, int32 n);
 uint32 sprintf_hex(char *s, uint32 n);
