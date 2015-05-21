@@ -18,9 +18,12 @@ typedef struct _s_kdata
 
     uint32 timer_tick;
 
-    uint8 *paging_low_table_addr;
-    uint8 *paging_low_pages_addr;
-    uint32 paging_low_pages_nb;
+
+    uint8 *kernel_start;
+    uint8 *kernel_end;
+    uint8 *paging_frame_table_addr;
+    uint8 *paging_frame_pages_addr;
+    uint32 paging_frame_pages_nb;
 } s_kdata;
 
 extern s_kdata kdata;

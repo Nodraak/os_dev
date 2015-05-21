@@ -18,8 +18,14 @@
 s_kdata kdata;
 
 
+extern uint8 ld_kernel_start;
+extern uint8 ld_kernel_end;
+
 void kinit(multiboot_info_t *mbi)
 {
+    kdata.kernel_start = &ld_kernel_start;
+    kdata.kernel_end = &ld_kernel_end;
+
     /* basic */
     screen_init();
     serial_init();
@@ -47,7 +53,7 @@ void kpannic(char *msg)
     printf("\n**********************\n");
     printf("=> Kernel pannic !! <=\n");
     printf("Reason : %s\n", msg);
-    printf("\n**********************\n");
+    printf("**********************\n");
 
     for (;;)
         ;
@@ -55,12 +61,11 @@ void kpannic(char *msg)
 
 void kmain(void)
 {
-    printf("OS loaded !\n");
-    printf("\nGreetings from kmain() !\n");
+    printf("OS loaded !\nGreetings from kmain() !\n");
 
     for (;;)
     {
-        printf("New shell spawning ...\n");
+        printf("Spawning new shell ...\n");
         shell_init();
         shell();
     }

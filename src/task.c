@@ -12,7 +12,7 @@ uint32 *task_pagedir;
 
 void debug(void)
 {
-    printf("-> from %d to %d\n", task_running-(&tasks[0])+1, task_running->next-(&tasks[0])+1);
+    printf("-> from %d to %d\n", (int)(task_running-(&tasks[0])+1), (int)(task_running->next-(&tasks[0])+1));
     printf("\n");
 }
 
