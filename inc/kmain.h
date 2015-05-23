@@ -6,7 +6,9 @@
 
 typedef struct _s_kdata
 {
-    s_buffer buffer_stdin;
+    uint8 *kernel_start;
+    uint8 *kernel_end;
+    uint32 kernel_size;
 
     uint8 screen_x;
     uint8 screen_y;
@@ -16,14 +18,11 @@ typedef struct _s_kdata
 
     uint16 serial_port_com1;
 
+    uint8 *page_frame_table_addr;
+    uint32 page_frame_nb;
+
     uint32 timer_tick;
-
-
-    uint8 *kernel_start;
-    uint8 *kernel_end;
-    uint8 *paging_frame_table_addr;
-    uint8 *paging_frame_pages_addr;
-    uint32 paging_frame_pages_nb;
+    s_buffer buffer_stdin;
 } s_kdata;
 
 extern s_kdata kdata;

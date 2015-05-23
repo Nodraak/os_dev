@@ -3,7 +3,7 @@
 
 #include "types.h"
 
-uint8 bitfield_get(uint32 bitfield, uint8 id);
-void bitfield_set(uint32 *bitfield, uint8 id, uint8 value);
+uint8 bitfield_get(uint8 bitfield, uint8 id);
+void bitfield_set(uint8 *bitfield, uint8 id, bool value);
 
 #endif

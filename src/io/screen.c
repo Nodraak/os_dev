@@ -4,6 +4,7 @@
 #include "serial.h"
 #include "io.h"
 #include "kmain.h"
+#include "printf.h"
 
 
 void screen_init(void)
@@ -23,7 +24,7 @@ void screen_init(void)
 
     for (i = 0; i < 16; ++i)
         _screen_write_char(0, i, ' ', i, kdata.screen_fg);
-    screen_write_str("\nScreen configured\n");
+    printf("\nScreen at %p configured\n", kdata.screen_ptr);
 }
 
 /*

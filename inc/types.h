@@ -2,6 +2,12 @@
 #define TYPE_H_INCLUDED
 
 #define NULL    ((void*)0)
+#define FALSE   0
+#define TRUE    (!FALSE)
+
+typedef unsigned char bool;
+
+typedef unsigned char bool;
 
 typedef unsigned char uchar;
 

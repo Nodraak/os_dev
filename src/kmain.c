@@ -9,6 +9,7 @@
 #include "idt.h"
 #include "pic.h"
 #include "keyboard.h"
+#include "page_frame.h"
 #include "paging.h"
 #include "timer.h"
 #include "buffer.h"
@@ -25,10 +26,11 @@ void kinit(multiboot_info_t *mbi)
 {
     kdata.kernel_start = &ld_kernel_start;
     kdata.kernel_end = &ld_kernel_end;
+    kdata.kernel_size = (uint32)(kdata.kernel_end-kdata.kernel_start);
 
     /* basic */
-    screen_init();
     serial_init();
+    screen_init();
 
     /* interrupts */
     printf("Installing GDT and IDT ...");
@@ -40,12 +42,15 @@ void kinit(multiboot_info_t *mbi)
 
     /* Memory */
     page_frame_init(mbi);
+    paging_init();
 
     /* misc */
     timer_init();
     buffer_init(&kdata.buffer_stdin);
 
     tasking_init();
+
+    printf("OS loaded !\n");
 }
 
 void kpannic(char *msg)
@@ -61,7 +66,7 @@ void kpannic(char *msg)
 
 void kmain(void)
 {
-    printf("OS loaded !\nGreetings from kmain() !\n");
+    printf("Greetings from kmain() !\n");
 
     for (;;)
     {

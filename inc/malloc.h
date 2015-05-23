@@ -5,5 +5,6 @@
 
 void *malloc(uint32 size);
 void free(void *ptr);
+void memset(void *ptr, uint32 len, uint8 data);
 
 #endif

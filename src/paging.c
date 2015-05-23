@@ -1,144 +1,88 @@
 
 #include "paging.h"
+#include "paging_att.h"
+#include "page_frame.h"
 #include "types.h"
-#include "multiboot.h"
 #include "printf.h"
-#include "bitfield.h"
 #include "kmain.h"
 
 
-void page_frame_init(multiboot_info_t *mbi)
+void paging_map_frame_virtual_to_phys(uint32 *page_directory, void *virt, void *phys, bool reload)
 {
-    multiboot_memory_map_t *mmap = NULL;
-    uint32 mem_upper = 0, mem_lower = 0, i = 0;
-    uint8 nb = 0;
+    uint32 *page_table = NULL;
+    uint32 pd_id = (uint32)virt >> 22;
+    uint32 pt_id = ((uint32)virt >> 12) & 0x03FF;
+    uint32 phys_rounded = (uint32)phys & 0xFFFFF000;
 
-    printf("Paging :\n");
-    printf("\tkstart : %p\n", kdata.kernel_start);
-    printf("\tkend : %p\n", kdata.kernel_end);
-    printf("\tsize : %d B\n", (uint32)(kdata.kernel_end-kdata.kernel_start));
+    printf("\tmapping %p to %p (pd_id=%d / pt_id=%d)\n", virt, phys, pd_id, pt_id);
 
-    /* are mem_lower and mem_upper valid ? */
-    if ((mbi->flags & (1 << 0)) == 0)
-        kpannic("PAGING : mem_lower and mem_upper flag not set");
-
-    mem_upper = mbi->mem_upper * 1024;
-    mem_lower = mbi->mem_lower * 1024;
-
-    printf("\tavailable mem_upper : %u B\n", mem_upper);
-    printf("\tavailable mem_lower : %u B\n", mem_lower);
-
-    /* paging_frame_pages_nb */
-    kdata.paging_frame_pages_nb = ((mem_upper/PAGE_SIZE)/8)*8; /* round to 8 to have full byte bitfield */
-
-    printf("\tpaging_frame_pages_nb : %u\n", kdata.paging_frame_pages_nb);
-    printf("\tmemory used by the frame_table : %u B\n", kdata.paging_frame_pages_nb/8);
-
-    if (kdata.paging_frame_pages_nb/8 > mem_lower)
-        kpannic("PAGING : no space for page table");
-
-    /* paging_frame_table_addr -> mem_lower */
-    nb = 0;
-    mmap = (multiboot_memory_map_t*)mbi->mmap_addr;
-    while ((uint32)mmap < mbi->mmap_addr + mbi->mmap_length)
+    /* page table */
+    if (page_directory[pd_id] & 0xFFFFF000)
     {
-        if (mmap->type == 1 && mmap->len_low == mem_lower)
-        {
-            kdata.paging_frame_table_addr = (uint8*)mmap->addr_low;
-            nb ++;
-        }
-
-        mmap = (multiboot_memory_map_t*)((uint32)mmap + mmap->size + sizeof(uint32));
+        page_table = (uint32*)(page_directory[pd_id] & 0xFFFFF000);
     }
-    if (nb != 1)
-        kpannic("PAGING : paging_frame_table_addr not found");
-
-    /* paging_frame_pages_addr -> mem_upper */
-    nb = 0;
-    mmap = (multiboot_memory_map_t*)mbi->mmap_addr;
-    while ((uint32)mmap < mbi->mmap_addr + mbi->mmap_length)
+    else
     {
-        if (mmap->type == 1 && mmap->len_low == mem_upper)
-        {
-            kdata.paging_frame_pages_addr = (uint8*)mmap->addr_low;
-            nb ++;
-        }
+        uint32 i;
 
-        mmap = (multiboot_memory_map_t*)((uint32)mmap + mmap->size + sizeof(uint32));
+        page_table = page_frame_alloc_addr(PAGE_SIZE);
+        printf("\tnew page_table at %p\n", page_table);
+
+        for (i = 0; i < 1024; i++)
+            page_table[i] = PF_FLAG_BASE;
     }
-    if (nb != 1)
-        kpannic("PAGING : paging_frame_pages_addr not found");
 
-    printf("\tpaging_low_pages_addr : %p\n", kdata.paging_frame_pages_addr);
-    printf("\tRAM available : %u\n", PAGE_SIZE*kdata.paging_frame_pages_nb);
+    /* register page frame */
+    page_directory[pd_id] = (uint32)page_table | PF_FLAG_BASE | PF_FLAG_PRESENT;
+    page_table[pt_id] = phys_rounded | PF_FLAG_BASE | PF_FLAG_PRESENT;
+    page_frame_set_addr((uint8*)phys_rounded, 1);
 
-    /* init page table */
-    for (i = 0; i < kdata.paging_frame_pages_nb/8; ++i)
-        kdata.paging_frame_pages_addr[i] = 0;
+    /* update cache */
+    if (reload)
+        paging_reload_page_directory();
+}
 
-    uint8 *ptr;
+
+void paging_init(void)
+{
+    uint32 *page_directory = NULL;
+    uint8 *ptr = NULL;
+    uint32 i;
+
+    printf("Setting up paging :\n");
+
+    /*
+        page dir
+    */
+    page_directory = page_frame_alloc_addr(PAGE_SIZE);
+
+    for (i = 0; i < 1024; i++)
+        page_directory[i] = PF_FLAG_BASE;
+
+    printf("\tpage_directory at %p\n", page_directory);
+
+    /*
+        page_tables
+    */
+
+    /* map lower 1 MiB */
+    uint8 *one_meg = (uint8*)0x100000;
+    for (ptr = 0; ptr < one_meg; ptr += PAGE_SIZE)
+        paging_map_frame_virtual_to_phys(page_directory, ptr, ptr, 0);
+
+    /* map kernel */
     for (ptr = kdata.kernel_start; ptr < kdata.kernel_end; ptr += PAGE_SIZE)
-        page_frame_alloc_pages_addr(1);
+        paging_map_frame_virtual_to_phys(page_directory, ptr, ptr, 0);
 
-    printf("Paging ok.\n");
-}
+    /* pd / pt */
+    for (ptr = (uint8*)page_directory; ptr <= (uint8*)page_directory+2*PAGE_SIZE; ptr += PAGE_SIZE)
+        paging_map_frame_virtual_to_phys(page_directory, ptr, ptr, 0);
 
-uint32 page_frame_alloc_pages_id(uint32 nb)
-{
-    uint32 i = 0, *ptr = NULL;
+    /*
+        enable
+    */
 
-    if (nb == 0)
-        kpannic("PAGING ALLOC : can't allocate zero page");
+    paging_load_and_enable_page_directory(page_directory);
 
-    if (nb != 1)
-        kpannic("PAGING ALLOC : can't alloc more than one page");
-
-    for (i = 0; i < kdata.paging_frame_pages_nb; ++i)
-    {
-        ptr = (uint32*)kdata.paging_frame_table_addr;
-
-        if (bitfield_get(ptr[i/8], i%8) == 0)
-        {
-            bitfield_set(&ptr[i/8], i%8, 1);
-            return i;
-        }
-    }
-
-    kpannic("PAGING ALLOC : no free page found");
-    return 0; /* silent warning */
-}
-
-void *page_frame_alloc_pages_addr(uint32 size)
-{
-    uint32 nb_frame, page_id = 0;
-
-    if (size == 0)
-    {
-        printf("WARNING : allocating zero bytes ...\n");
-        return 0;
-    }
-
-    nb_frame = size / PAGE_SIZE;
-    if (size % PAGE_SIZE)
-        nb_frame ++;
-
-    page_id = page_frame_alloc_pages_id(nb_frame);
-
-    return (kdata.paging_frame_pages_addr + page_id*PAGE_SIZE);
-}
-
-void page_frame_free_page_id(uint32 page_id)
-{
-    uint32 *ptr = (uint32*)kdata.paging_frame_table_addr;
-
-    if (bitfield_get(ptr[page_id/8], page_id%8) == 0 && page_id != 0)
-        kpannic("PAGING FREE : page not allocated");
-
-    bitfield_set(&ptr[page_id/8], page_id%8, 0);
-}
-
-void page_frame_free_page_addr(void *page_addr)
-{
-    uint32 page_id = ((uint8*)page_addr-kdata.paging_frame_pages_addr) / PAGE_SIZE;
-    page_frame_free_page_id(page_id);
+    printf("Paging was successfully enabled !\n");
 }
