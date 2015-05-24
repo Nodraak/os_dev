@@ -78,3 +78,13 @@ int32 str_cmp(char *s1, char *s2)
 
     return *s1 - *s2;
 }
+
+/* Fills memory pointed by *ptr*, setting the 32 bits wide *data* *count* times
+*/
+void str_memset32(uint32 *ptr, uint32 count, uint32 data)
+{
+    uint32 i = 0;
+
+    for (i = 0; i < count; ++i)
+        ptr[i] = data;
+}

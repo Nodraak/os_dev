@@ -30,7 +30,7 @@ gdt_start:
     dw 0            ; limit 15:0
     dw 0            ; base 15:0
     db 0            ; base 23:16
-    db 0            ; type
+    db 0            ; type (access byte)
     db 0            ; limit 19:16, flags
     db 0            ; base 31:24
 ; code

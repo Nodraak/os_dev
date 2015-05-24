@@ -1,88 +1,132 @@
 
 #include "paging.h"
-#include "paging_att.h"
+#include "x86/paging.h"
 #include "page_frame.h"
 #include "types.h"
 #include "printf.h"
 #include "kmain.h"
+#include "string.h"
 
 
-void paging_map_frame_virtual_to_phys(uint32 *page_directory, void *virt, void *phys, bool reload)
+void paging_map_frame_virtual_to_phys(void *virt, void *phys)
 {
-    uint32 *page_table = NULL;
     uint32 pd_id = (uint32)virt >> 22;
     uint32 pt_id = ((uint32)virt >> 12) & 0x03FF;
-    uint32 phys_rounded = (uint32)phys & 0xFFFFF000;
+
+    if (((uint32)virt % PAGE_SIZE) || ((uint32)phys % PAGE_SIZE))
+        kpanic("paging_map_frame_virtual_to_phys");
+
+    /* page table doesnt exist yet, create a new one */
+    if (!(kdata.page_directory[pd_id] & PF_FLAG_PRESENT))
+    {
+        uint32 *page_table = page_frame_alloc_addr(PAGE_SIZE);
+
+        printf("\tnew page_table at %p\n", page_table);
+
+        // todo : if no free page frame is in a mapped area, we are fucked. Use recursive mapping ?
+        paging_map_frame_virtual_to_phys(page_table, page_table);
+
+        /* map the page table */
+        kdata.page_directory[pd_id] = (uint32)page_table | PF_FLAG_BASE | PF_FLAG_PRESENT;
+        str_memset32(page_table, 1024, PF_FLAG_BASE);
+
+        paging_reload_page_directory();
+    }
 
     printf("\tmapping %p to %p (pd_id=%d / pt_id=%d)\n", virt, phys, pd_id, pt_id);
 
-    /* page table */
-    if (page_directory[pd_id] & 0xFFFFF000)
-    {
-        page_table = (uint32*)(page_directory[pd_id] & 0xFFFFF000);
-    }
-    else
-    {
-        uint32 i;
+    uint32 *page_table = (uint32*)(kdata.page_directory[pd_id] & 0xFFFFF000);
 
-        page_table = page_frame_alloc_addr(PAGE_SIZE);
-        printf("\tnew page_table at %p\n", page_table);
-
-        for (i = 0; i < 1024; i++)
-            page_table[i] = PF_FLAG_BASE;
+    if (page_table[pt_id] & PF_FLAG_PRESENT)
+    {
+        printf("\tWarning : page_table_entry already mapped to %x (overwritting with %x)\n",
+            page_table[pt_id] & 0xFFFFF000, (uint32)phys);
     }
 
-    /* register page frame */
-    page_directory[pd_id] = (uint32)page_table | PF_FLAG_BASE | PF_FLAG_PRESENT;
-    page_table[pt_id] = phys_rounded | PF_FLAG_BASE | PF_FLAG_PRESENT;
-    page_frame_set_addr((uint8*)phys_rounded, 1);
+    page_table[pt_id] = (uint32)phys | PF_FLAG_BASE | PF_FLAG_PRESENT;
 
-    /* update cache */
-    if (reload)
-        paging_reload_page_directory();
+    /* update paging */
+    paging_reload_page_directory();
 }
 
 
 void paging_init(void)
 {
-    uint32 *page_directory = NULL;
+    uint32 *page_table = NULL;
     uint8 *ptr = NULL;
-    uint32 i;
 
-    printf("Setting up paging :\n");
+    printf("Paging : init\n");
 
     /*
         page dir
     */
-    page_directory = page_frame_alloc_addr(PAGE_SIZE);
+    /* new page_dir */
+    kdata.page_directory = page_frame_alloc_addr(PAGE_SIZE);
+    str_memset32(kdata.page_directory, 1024, PF_FLAG_BASE);
 
-    for (i = 0; i < 1024; i++)
-        page_directory[i] = PF_FLAG_BASE;
+    kdata.page_directory[1023] = (uint32)kdata.page_directory | PF_FLAG_BASE | PF_FLAG_PRESENT;
 
-    printf("\tpage_directory at %p\n", page_directory);
+    printf("\tpage_directory at %p\n", kdata.page_directory);
+
+    /* init one new page_table for lower 4 MiB (lower 1 MiB + kernel + page dir + a few page tables) (pd_id == 0) */
+    page_table = page_frame_alloc_addr(PAGE_SIZE);
+    str_memset32(page_table, 1024, PF_FLAG_BASE);
+
+    kdata.page_directory[0] = (uint32)page_table | PF_FLAG_BASE | PF_FLAG_PRESENT;
 
     /*
-        page_tables
+        map
     */
 
     /* map lower 1 MiB */
-    uint8 *one_meg = (uint8*)0x100000;
-    for (ptr = 0; ptr < one_meg; ptr += PAGE_SIZE)
-        paging_map_frame_virtual_to_phys(page_directory, ptr, ptr, 0);
+    printf("one meg\n");
+    for (ptr = 0; ptr < (uint8*)0x100000; ptr += PAGE_SIZE)
+        paging_map_frame_virtual_to_phys(ptr, ptr);
 
     /* map kernel */
+    printf("kernel\n");
     for (ptr = kdata.kernel_start; ptr < kdata.kernel_end; ptr += PAGE_SIZE)
-        paging_map_frame_virtual_to_phys(page_directory, ptr, ptr, 0);
+        paging_map_frame_virtual_to_phys(ptr, ptr);
 
-    /* pd / pt */
-    for (ptr = (uint8*)page_directory; ptr <= (uint8*)page_directory+2*PAGE_SIZE; ptr += PAGE_SIZE)
-        paging_map_frame_virtual_to_phys(page_directory, ptr, ptr, 0);
+    /* map page_dir + page_table */
+    printf("page_dir + page_table\n");
+    paging_map_frame_virtual_to_phys(kdata.page_directory, kdata.page_directory);
+    paging_map_frame_virtual_to_phys(page_table, page_table);
 
     /*
         enable
     */
+    printf("Paging : enabling ...\n");
+    paging_write_cr3(kdata.page_directory);
+    paging_write_cr0((uint32*)(paging_read_cr0() | (1 << 31)));
+    printf(" ok\n");
 
-    paging_load_and_enable_page_directory(page_directory);
+    /*
+        testing
+    */
 
-    printf("Paging was successfully enabled !\n");
+    printf("Paging : test\n");
+    _paging_test_addr((uint32*)(2*1024*1024), (uint32*)(3*1024*1024));
+    _paging_test_addr((uint32*)(5*1024*1024), (uint32*)(7*1024*1024));
+}
+
+
+void _paging_test_addr(uint32 *ptr1, uint32 *ptr2)
+{
+    printf("Testing %p -> %p\n", ptr1, ptr2);
+
+    printf("\tIdentity mapping ...\n");
+    paging_map_frame_virtual_to_phys(ptr1, ptr1);
+    paging_map_frame_virtual_to_phys(ptr2, ptr2);
+    printf("\t-> ok\n");
+
+    *ptr1 = 21, *ptr2 = 42;
+    printf("\tCurrent values : %d %d\n", *ptr1, *ptr2);
+
+    printf("\tRemapping ...\n");
+    paging_map_frame_virtual_to_phys(ptr1, ptr2);
+    paging_map_frame_virtual_to_phys(ptr2, ptr1);
+    printf("\t-> ok\n");
+
+    printf("\tnew values : %d %d\n", *ptr1, *ptr2);
 }

@@ -20,6 +20,7 @@ typedef struct _s_kdata
 
     uint8 *page_frame_table_addr;
     uint32 page_frame_nb;
+    uint32 *page_directory;
 
     uint32 timer_tick;
     s_buffer buffer_stdin;

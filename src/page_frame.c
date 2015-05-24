@@ -5,8 +5,8 @@
 #include "printf.h"
 #include "bitfield.h"
 #include "kmain.h"
+#include "malloc.h"
 
-void memset(void *ptr, uint32 len, uint8 data);
 
 void page_frame_init(multiboot_info_t *mbi)
 {

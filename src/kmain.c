@@ -50,7 +50,7 @@ void kinit(multiboot_info_t *mbi)
 
     tasking_init();
 
-    printf("OS loaded !\n");
+    printf("OS loaded !\n\n");
 }
 
 void kpannic(char *msg)

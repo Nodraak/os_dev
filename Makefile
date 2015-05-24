@@ -3,7 +3,7 @@ SUBDIR = descriptor_tables io x86 shell
 
 _OBJECTS_DT = gdt.o idt.o pic.o
 _OBJECTS_IO = buffer.o keyboard.o printf.o screen.o serial.o
-_OBJECTS_X86 = boot.o io.o paging_att.o
+_OBJECTS_X86 = boot.o io.o paging.o
 _OBJECTS_SHELL = shell.o
 _OBJECTS_MAIN = kmain.o string.o timer.o page_frame.o bitfield.o malloc.o task.o switch_att.o paging.o
 
@@ -12,7 +12,7 @@ OBJECTS = $(addprefix obj/, $(_OBJECTS))
 
 CC = /opt/cross_os/bin/i686-elf-gcc
 CFLAGS = -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
-	-nostartfiles -nodefaultlibs -ffreestanding -lgcc -Wall -Wextra -c -I inc/ $(addprefix -I inc/, $(SUBDIR))
+	-nostartfiles -nodefaultlibs -ffreestanding -lgcc -Wall -Wextra -g -c -I inc/ $(addprefix -I inc/, $(SUBDIR))
 
 LD = /opt/cross_os/bin/i686-elf-ld
 LDFLAGS = -T link.ld
@@ -52,9 +52,6 @@ run: os.iso
 	bochs -f bochsrc.txt
 
 obj/switch_att.o: src/switch_att.s
-	as --32 $< -o $@
-
-obj/x86/paging_att.o: src/x86/paging_att.s
 	as --32 $< -o $@
 
 obj/%.o: src/%.c
