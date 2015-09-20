@@ -98,7 +98,7 @@ uint32 sprintf_unsigned_number(char *s, uint32 n, uint32 base, uint8 group_by)
     char digits[] = "0123456789ABCDEF";
 
     if (base == 0 || base > 16)
-        kpannic("SPRINTF : invalid base");
+        kpanic("SPRINTF : invalid base");
 
     if (n == 0)
     {

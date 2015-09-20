@@ -28,7 +28,7 @@ void page_frame_init(multiboot_info_t *mbi)
     while ((uint32)mmap < mbi->mmap_addr + mbi->mmap_length)
     {
         if (mmap->addr_high || mmap->len_high)
-            kpannic("PAGE FRAME : 64 bits addr not implemented");
+            kpanic("PAGE FRAME : 64 bits addr not implemented");
 
         if ((uint8*)mmap->addr_low > max_addr)
             max_addr = (uint8*)mmap->addr_low;
@@ -41,7 +41,7 @@ void page_frame_init(multiboot_info_t *mbi)
     printf("\tpage_frame_nb : %u\n", kdata.page_frame_nb);
 
     if (kdata.page_frame_nb % 8)
-        kpannic("PAGE FRAME : page_frame_nb %% 8 != 0 (incomming bitfield error)");
+        kpanic("PAGE FRAME : page_frame_nb %% 8 != 0 (incomming bitfield error)");
 
     page_frame_table_size = kdata.page_frame_nb/8;
 
@@ -52,7 +52,7 @@ void page_frame_init(multiboot_info_t *mbi)
     */
 
     if ((mbi->flags & (1 << 0)) == 0)
-        kpannic("PAGE FRAME : mem_lower and mem_upper flags not set");
+        kpanic("PAGE FRAME : mem_lower and mem_upper flags not set");
 
     mem_upper = mbi->mem_upper * 1024;
     mem_lower = mbi->mem_lower * 1024;
@@ -69,9 +69,14 @@ void page_frame_init(multiboot_info_t *mbi)
 
     /*
         init page_frame_table :
-            set everything as used
-            set mem_upper as free
-            set kernel data as used
+            mark everything as used (to prevent errors if allocating weird reserved regions (for the bios or whatever))
+            mark mem_upper as free (todo: we could mark mem_lower as free too)
+            mark kernel data as used
+
+    ram addr            0                                max
+    whole physical ram  |---------------------------------|
+    mem_upper                   |-------------------------|
+    kernel data                     |---|
     */
 
     memset(kdata.page_frame_table_addr, page_frame_table_size, 0xFF);
@@ -105,13 +110,13 @@ multiboot_memory_map_t *page_frame_init_get_mmap_entry(multiboot_info_t *mbi, ui
     }
 
     if (nb != 1)
-        kpannic("PAGE FRAME : page_frame_init_get_mmap_entry() returned multiple results");
+        kpanic("PAGE FRAME : page_frame_init_get_mmap_entry() returned multiple results");
 
     return ret;
 }
 
 
-void page_frame_set_addr(uint8 *addr, bool data)
+void page_frame_set_addr(uint8 *addr, bool data) /* todo: bool: make defines PAGE_FRAME_USED / PAGE_FRAME_FREE */
 {
     page_frame_set_id((uint32)addr/PAGE_SIZE, data);
 }
@@ -119,7 +124,7 @@ void page_frame_set_addr(uint8 *addr, bool data)
 
 void page_frame_set_id(uint32 id, bool data)
 {
-    bitfield_set(&kdata.page_frame_table_addr[id/8], 7-(id%8), data);
+    bitfield_set(&kdata.page_frame_table_addr[id/8], id%8, data);
 }
 
 
@@ -129,23 +134,23 @@ uint32 page_frame_alloc_id(uint32 nb)
     uint8 *ptr = NULL;
 
     if (nb == 0)
-        kpannic("PAGE FRAME ALLOC : can't allocate zero page");
+        kpanic("PAGE FRAME ALLOC : can't allocate zero page");
 
     if (nb != 1)
-        kpannic("PAGE FRAME ALLOC : can't alloc more than one page"); /* todo */
+        kpanic("PAGE FRAME ALLOC : can't alloc more than one page"); /* todo */
 
     for (i = 0; i < kdata.page_frame_nb; ++i)
     {
         ptr = kdata.page_frame_table_addr;
 
-        if (bitfield_get(ptr[i/8], 7-(i%8)) == 0)
+        if (bitfield_get(ptr[i/8], i%8) == 0)
         {
-            bitfield_set(&ptr[i/8], 7-(i%8), 1);
+            bitfield_set(&ptr[i/8], i%8, 1);
             return i;
         }
     }
 
-    kpannic("PAGE FRAME ALLOC : no free page found");
+    kpanic("PAGE FRAME ALLOC : no free page found");
     return 0; /* silent warning */
 }
 
@@ -155,7 +160,7 @@ void *page_frame_alloc_addr(uint32 size)
     uint32 page_frame_nb, page_id = 0;
 
     if (size == 0)
-        kpannic("PAGE FRAME ALLOC : can't allocate zero bytes");
+        kpanic("PAGE FRAME ALLOC : can't allocate zero bytes");
 
     page_frame_nb = size / PAGE_SIZE;
     if (size % PAGE_SIZE != 0)
@@ -171,10 +176,10 @@ void page_frame_free_id(uint32 page_id)
 {
     uint8 *ptr = kdata.page_frame_table_addr;
 
-    if (bitfield_get(ptr[page_id/8], 7-(page_id%8)) == 0)
-        kpannic("PAGE FRAME FREE : freeing a not allocated page");
+    if (bitfield_get(ptr[page_id/8], page_id%8) == 0)
+        kpanic("PAGE FRAME FREE : freeing a not allocated page");
 
-    bitfield_set(&ptr[page_id/8], 7-(page_id%8), 0);
+    bitfield_set(&ptr[page_id/8], page_id%8, 0);
 }
 
 

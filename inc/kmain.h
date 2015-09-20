@@ -29,7 +29,7 @@ typedef struct _s_kdata
 extern s_kdata kdata;
 
 void kinit(multiboot_info_t *mbi);
-void kpannic(char *msg);
+void kpanic(char *msg);
 void kmain(void);
 
 #endif

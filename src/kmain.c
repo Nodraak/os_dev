@@ -53,12 +53,13 @@ void kinit(multiboot_info_t *mbi)
     printf("OS loaded !\n\n");
 }
 
-void kpannic(char *msg)
+void kpanic(char *msg)
 {
-    printf("\n**********************\n");
-    printf("=> Kernel pannic !! <=\n");
+    printf("\n");
+    printf("****************************************\n");
+    printf("==> Kernel panic !! <==\n");
     printf("Reason : %s\n", msg);
-    printf("**********************\n");
+    printf("****************************************\n");
 
     for (;;)
         ;

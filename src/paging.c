@@ -26,9 +26,9 @@ void paging_map_frame_virtual_to_phys(void *virt, void *phys)
         // todo : if no free page frame is in a mapped area, we are fucked. Use recursive mapping ?
         paging_map_frame_virtual_to_phys(page_table, page_table);
 
-        /* map the page table */
-        kdata.page_directory[pd_id] = (uint32)page_table | PF_FLAG_BASE | PF_FLAG_PRESENT;
+        /* init and map the page table */
         str_memset32(page_table, 1024, PF_FLAG_BASE);
+        kdata.page_directory[pd_id] = (uint32)page_table | PF_FLAG_BASE | PF_FLAG_PRESENT;
 
         paging_reload_page_directory();
     }
