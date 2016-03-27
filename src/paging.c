@@ -105,28 +105,22 @@ void paging_init(void)
         testing
     */
 
-    printf("Paging : test\n");
-    _paging_test_addr((uint32*)(2*1024*1024), (uint32*)(3*1024*1024));
-    _paging_test_addr((uint32*)(5*1024*1024), (uint32*)(7*1024*1024));
+    printf("Paging: test\n");
+    _paging_test_addr((char*)(2*1024*1024), (char*)(3*1024*1024));
+    _paging_test_addr((char*)(30*1024*1024), (char*)(31*1024*1024));
 }
 
 
-void _paging_test_addr(uint32 *ptr1, uint32 *ptr2)
+void _paging_test_addr(char *ptr1, char *ptr2)
 {
-    printf("Testing %p -> %p\n", ptr1, ptr2);
-
-    printf("\tIdentity mapping ...\n");
+    printf("\tMapping %p->%p and %p->%p...\n", ptr1, ptr1, ptr2, ptr2);
     paging_map_frame_virtual_to_phys(ptr1, ptr1);
     paging_map_frame_virtual_to_phys(ptr2, ptr2);
     printf("\t-> ok\n");
-
-    *ptr1 = 21, *ptr2 = 42;
-    printf("\tCurrent values : %d %d\n", *ptr1, *ptr2);
-
-    printf("\tRemapping ...\n");
+    *ptr1 = 42, *ptr2 = 43;
+    printf("\tCurrent value: %p=%d and %p=%d\n", ptr1, *ptr1, ptr2, *ptr2);
+    printf("\tRemapping %p to %p...\n", ptr1, ptr2);
     paging_map_frame_virtual_to_phys(ptr1, ptr2);
-    paging_map_frame_virtual_to_phys(ptr2, ptr1);
     printf("\t-> ok\n");
-
-    printf("\tnew values : %d %d\n", *ptr1, *ptr2);
+    printf("\tnew value: %p=%d and %p=%d\n", ptr1, *ptr1, ptr2, *ptr2);
 }

@@ -3,9 +3,7 @@
 
 #define NULL    ((void*)0)
 #define FALSE   0
-#define TRUE    (!FALSE)
-
-typedef unsigned char bool;
+#define TRUE    1
 
 typedef unsigned char bool;
 

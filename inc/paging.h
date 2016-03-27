@@ -9,6 +9,6 @@
 void paging_map_frame_virtual_to_phys(void *virt, void *phys);
 void paging_init(void);
 
-void _paging_test_addr(uint32 *ptr1, uint32 *ptr2);
+void _paging_test_addr(char *ptr1, char *ptr2);
 
 #endif
