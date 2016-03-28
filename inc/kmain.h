@@ -32,4 +32,7 @@ void kinit(multiboot_info_t *mbi);
 void kpanic(char *msg);
 void kmain(void);
 
+void _kpanic(char *msg, const char *file, int line, const char *func);
+#define kpanic(msg) _kpanic(msg, __FILE__, __LINE__, __FUNCTION__)
+
 #endif

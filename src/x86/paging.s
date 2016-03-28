@@ -18,7 +18,7 @@ paging_write_cr0:
     mov ebp, esp
     mov eax, [ebp+8]
     mov cr0,  eax
-    pop ebp
+    leave ; leave == mov esp, ebp + pop ebp
     ret
 
 paging_read_cr3:
@@ -30,7 +30,7 @@ paging_write_cr3:
     mov ebp, esp
     mov eax, [ebp+8]
     mov cr3, eax
-    pop ebp
+    leave ; leave == mov esp, ebp + pop ebp
     ret
 
 paging_reload_page_directory:

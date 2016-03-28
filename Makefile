@@ -5,7 +5,7 @@ _OBJECTS_DT = gdt.o idt.o pic.o
 _OBJECTS_IO = buffer.o keyboard.o printf.o screen.o serial.o
 _OBJECTS_X86 = boot.o io.o paging.o
 _OBJECTS_SHELL = shell.o
-_OBJECTS_MAIN = kmain.o string.o timer.o page_frame.o bitfield.o malloc.o task.o switch_att.o paging.o
+_OBJECTS_MAIN = kmain.o string.o timer.o page_frame.o bitfield.o malloc.o task.o switch_intel.o paging.o
 
 _OBJECTS = $(addprefix descriptor_tables/, $(_OBJECTS_DT)) $(addprefix io/, $(_OBJECTS_IO)) $(addprefix x86/, $(_OBJECTS_X86)) $(addprefix shell/, $(_OBJECTS_SHELL)) $(_OBJECTS_MAIN)
 OBJECTS = $(addprefix obj/, $(_OBJECTS))

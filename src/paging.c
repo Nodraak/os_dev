@@ -1,11 +1,12 @@
 
 #include "paging.h"
-#include "x86/paging.h"
+#include "paging.s.h"
 #include "page_frame.h"
 #include "types.h"
 #include "printf.h"
 #include "kmain.h"
 #include "string.h"
+#include "task.h"
 
 
 void paging_map_frame_virtual_to_phys(void *virt, void *phys)
@@ -13,8 +14,10 @@ void paging_map_frame_virtual_to_phys(void *virt, void *phys)
     uint32 pd_id = (uint32)virt >> 22;
     uint32 pt_id = ((uint32)virt >> 12) & 0x03FF;
 
-    if (((uint32)virt % PAGE_SIZE) || ((uint32)phys % PAGE_SIZE))
-        kpanic("paging_map_frame_virtual_to_phys");
+    if ((uint32)virt % PAGE_SIZE)
+        kpanic("Virtual address not aligned to PAGE_SIZE");
+    if ((uint32)phys % PAGE_SIZE)
+        kpanic("Physical address not aligned to PAGE_SIZE");
 
     /* page table doesnt exist yet, create a new one */
     if (!(kdata.page_directory[pd_id] & PF_FLAG_PRESENT))

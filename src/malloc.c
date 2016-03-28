@@ -3,10 +3,14 @@
 #include "types.h"
 #include "page_frame.h"
 #include "kmain.h"
+#include "paging.h"
+
 
 void *malloc(uint32 size)
 {
-    return page_frame_alloc_addr(size);
+    void *ptr = page_frame_alloc_addr(size);
+    paging_map_frame_virtual_to_phys(ptr, ptr);
+    return ptr;
 }
 
 void free(void *ptr)

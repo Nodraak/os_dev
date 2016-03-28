@@ -88,12 +88,17 @@ void pic_irq_disable(uint8 irq)
     }
 }
 
-void pic_int_handler_install(void(*callback)(void), uint32 irq_vect, uint32 irq_id)
+void int_handler_install(void(*callback)(void), uint32 irq_vect)
 {
     s_vector v;
 
     v.eip = (uint32)callback;
     v.access_byte = IRQ_ACCESS_BYTE;
     setvect(&v, irq_vect);
+}
+
+void pic_int_handler_install(void(*callback)(void), uint32 irq_vect, uint32 irq_id)
+{
+    int_handler_install(callback, irq_vect);
     pic_irq_enable(irq_id);
 }

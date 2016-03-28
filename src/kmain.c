@@ -40,7 +40,7 @@ void kinit(multiboot_info_t *mbi)
     pic_remap();
     kb_int_handler_install();
 
-    /* Memory */
+    /* memory */
     page_frame_init(mbi);
     paging_init();
 
@@ -53,12 +53,13 @@ void kinit(multiboot_info_t *mbi)
     printf("OS loaded !\n\n");
 }
 
-void kpanic(char *msg)
+void _kpanic(char *msg, const char *file, int line, const char *func)
 {
     printf("\n");
     printf("****************************************\n");
-    printf("==> Kernel panic !! <==\n");
-    printf("Reason : %s\n", msg);
+    printf("Kernel panic !!\n");
+    printf("At %s() in %s:%d\n", func, file, line);
+    printf("Reason: %s\n", msg);
     printf("****************************************\n");
 
     for (;;)

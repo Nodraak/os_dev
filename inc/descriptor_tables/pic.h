@@ -56,6 +56,7 @@ void pic_remap(void);
 void pic_ack(uchar irq);
 void pic_irq_enable(uint8 irq);
 void pic_irq_disable(uint8 irq);
+void int_handler_install(void(*callback)(void), uint32 irq_vect);
 void pic_int_handler_install(void(*callback)(void), uint32 irq_vect, uint32 irq_id);
 
 #endif
