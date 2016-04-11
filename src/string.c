@@ -9,7 +9,6 @@ uint32 str_len(char *s)
 
     while (s[len] != '\0')
         len ++;
-    len ++; /* for '\0' */
 
     return len;
 }
