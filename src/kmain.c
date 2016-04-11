@@ -10,7 +10,7 @@
 #include "pic.h"
 #include "keyboard.h"
 #include "page_frame.h"
-#include "paging.h"
+#include "paging.c.h"
 #include "timer.h"
 #include "buffer.h"
 #include "shell.h"

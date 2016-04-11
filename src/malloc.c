@@ -3,7 +3,7 @@
 #include "types.h"
 #include "page_frame.h"
 #include "kmain.h"
-#include "paging.h"
+#include "paging.c.h"
 
 
 void *malloc(uint32 size)

@@ -1,14 +1,6 @@
 
 global tasking_switch
 
-section .text
-
-global magic_breakpoint
-magic_breakpoint:
-    xchg bx, bx
-    ret
-
-extern print_regs
 
 ; Regs saved/restored (cf task.h): eax, ebx, ecx, edx, esi, edi, esp, ebp, eip, eflags, cr3
 tasking_switch:

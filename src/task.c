@@ -2,7 +2,7 @@
 #include "task.h"
 #include "types.h"
 #include "malloc.h"
-#include "paging.h"
+#include "paging.c.h"
 #include "paging.s.h"
 #include "page_frame.h"
 #include "printf.h"
