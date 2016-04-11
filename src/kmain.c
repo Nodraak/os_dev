@@ -15,6 +15,8 @@
 #include "buffer.h"
 #include "shell.h"
 #include "task.h"
+#include "read_elf.c.h"
+
 
 s_kdata kdata;
 
@@ -31,6 +33,10 @@ void kinit(multiboot_info_t *mbi)
     /* basic */
     serial_init();
     screen_init();
+
+    if (!(mbi->flags & (1 << 5)))
+        kpanic("no symbol data in os image");
+    elf_print_stats(mbi->_.elf_sec);
 
     /* interrupts */
     printf("Installing GDT and IDT ...");

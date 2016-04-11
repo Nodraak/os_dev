@@ -88,6 +88,20 @@ void page_frame_init(multiboot_info_t *mbi)
     for (ptr = (uint8*)kdata.kernel_start; ptr < (uint8*)kdata.kernel_end; ptr += PAGE_SIZE)
         page_frame_set_addr(ptr, 1);
 
+    for (
+        ptr = (uint8*)kdata.symbol_string_table;
+        ptr < (uint8*)kdata.symbol_string_table + kdata.symbol_string_table_size;
+        ptr += PAGE_SIZE
+    )
+        page_frame_set_addr(ptr, 1);
+
+    for (
+        ptr = (uint8*)kdata.symbol_table;
+        ptr < (uint8*)kdata.symbol_table + kdata.symbol_table_size;
+        ptr += PAGE_SIZE
+    )
+        page_frame_set_addr(ptr, 1);
+
     printf("Page frame ok.\n");
 }
 

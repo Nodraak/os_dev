@@ -1,11 +1,11 @@
 
 SUBDIR = descriptor_tables io x86 shell
 
-_OBJECTS_DT = gdt.o idt.o pic.o
-_OBJECTS_IO = buffer.o keyboard.o printf.o screen.o serial.o
-_OBJECTS_X86 = boot.o io.o paging.o
-_OBJECTS_SHELL = shell.o
-_OBJECTS_MAIN = kmain.o string.o timer.o page_frame.o bitfield.o malloc.o task.o switch_intel.o paging.o
+_OBJECTS_DT = gdt.s.o idt.s.o pic.c.o
+_OBJECTS_IO = buffer.c.o keyboard.c.o printf.c.o screen.c.o serial.c.o
+_OBJECTS_X86 = boot.s.o io.s.o paging.s.o
+_OBJECTS_SHELL = shell.c.o
+_OBJECTS_MAIN = kmain.c.o string.c.o timer.c.o page_frame.c.o bitfield.c.o malloc.c.o task.c.o switch_intel.s.o paging.c.o utils.s.o utils.c.o read_elf.c.o
 
 _OBJECTS = $(addprefix descriptor_tables/, $(_OBJECTS_DT)) $(addprefix io/, $(_OBJECTS_IO)) $(addprefix x86/, $(_OBJECTS_X86)) $(addprefix shell/, $(_OBJECTS_SHELL)) $(_OBJECTS_MAIN)
 OBJECTS = $(addprefix obj/, $(_OBJECTS))
@@ -51,13 +51,10 @@ run: os.iso
 	rm -f serial.txt
 	bochs -f bochsrc.txt
 
-obj/switch_att.o: src/switch_att.s
-	as --32 $< -o $@
-
-obj/%.o: src/%.c
+obj/%.c.o: src/%.c
 	$(CC) $(CFLAGS) $< -o $@
 
-obj/%.o: src/%.s
+obj/%.s.o: src/%.s
 	$(AS) $(ASFLAGS) $< -o $@
 
 clean:

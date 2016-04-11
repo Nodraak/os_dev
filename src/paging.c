@@ -91,6 +91,20 @@ void paging_init(void)
     for (ptr = kdata.kernel_start; ptr < kdata.kernel_end; ptr += PAGE_SIZE)
         paging_map_frame_virtual_to_phys(ptr, ptr);
 
+    for (
+        ptr = (uint8*)((uint32)kdata.symbol_string_table & (~0xFFF));
+        ptr < (uint8*)(kdata.symbol_string_table + kdata.symbol_string_table_size);
+        ptr += PAGE_SIZE
+    )
+        paging_map_frame_virtual_to_phys(ptr, ptr);
+
+    for (
+        ptr = (uint8*)((uint32)kdata.symbol_table & (~0xFFF));
+        ptr < (uint8*)(kdata.symbol_table + kdata.symbol_table_size);
+        ptr += PAGE_SIZE
+    )
+        paging_map_frame_virtual_to_phys(ptr, ptr);
+
     /* map page_dir + page_table */
     printf("page_dir + page_table\n");
     paging_map_frame_virtual_to_phys(kdata.page_directory, kdata.page_directory);

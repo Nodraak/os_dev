@@ -3,12 +3,18 @@
 
 #include "buffer.h"
 #include "multiboot.h"
+#include "read_elf.c.h"
 
 typedef struct _s_kdata
 {
     uint8 *kernel_start;
     uint8 *kernel_end;
     uint32 kernel_size;
+
+    char *symbol_string_table;
+    uint32 symbol_string_table_size;
+    elf_symbol *symbol_table;
+    uint32 symbol_table_size;
 
     uint8 screen_x;
     uint8 screen_y;
