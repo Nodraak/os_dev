@@ -6,8 +6,15 @@
 #define __va_rounded_size(TYPE) (((sizeof(TYPE) + sizeof(int) - 1) / sizeof(int)) * sizeof(int))
 #define va_start(AP, ARG) (AP = (char*)&ARG + __va_rounded_size(ARG))
 #define va_arg(AP, TYPE) (AP += __va_rounded_size(TYPE), *((TYPE *)((AP) - __va_rounded_size(TYPE))))
-
 typedef char* va_list;
+
+#define BASE_INT 10
+#define BASE_HEX 16
+#define GROUPBY_NONE 0
+#define GROUPBY_INT 3
+#define GROUPBY_BIN 4
+
+#define isdigit(c)  (((c) >= '0') && ((c) <= '9'))
 
 void printf(char *format, ...) __attribute__ ((format (printf, 1, 2)));
 
@@ -21,8 +28,6 @@ uint32 sprintf_binary(char *s, uint32 n);
 int get_pad_width(int32 n, uint8 base, uint8 group_by);
 
 uint32 m_pow(uint32 n, uint32 p);
-
-#define isdigit(c)  (((c) >= '0') && ((c) <= '9'))
 // todo math
 #define abs(n)      ((n) > 0 ? (n) : -(n))
 

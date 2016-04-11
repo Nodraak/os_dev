@@ -38,120 +38,76 @@ void sprintf(char *format, char *ap, char *buf, uint32 buf_size)
 mod_switch:
             switch (*cur)
             {
-                case '%':
-                    buf[i] = '%';
-                    i ++;
-                    break;
-                case 'c':
-                    buf[i] = va_arg(ap, char);
-                    i ++;
-                    break;
-                case 'd':
-                    itmp = va_arg(ap, int32);
-                    to_pad -= get_pad_width(abs(itmp), 10, 3);
-
-                    if (pad_reverse)
-                    {
-                        i += sprintf_int(&buf[i], itmp);
-                        while (to_pad-- > 0)
-                            buf[i++] = ' ';
-                    }
-                    else
-                    {
-                        while (to_pad-- > 0)
-                            buf[i++] = ' ';
-                        i += sprintf_int(&buf[i], itmp);
-                    }
-                    break;
-                case 'u':
-                    uitmp = va_arg(ap, uint32);
-                    to_pad -= get_pad_width(uitmp, 10, 3);
-
-                    if (pad_reverse)
-                    {
-                        i += sprintf_uint(&buf[i], uitmp);
-                        while (to_pad-- > 0)
-                            buf[i++] = ' ';
-                    }
-                    else
-                    {
-                        while (to_pad-- > 0)
-                            buf[i++] = ' ';
-                        i += sprintf_uint(&buf[i], uitmp);
-                    }
-                    break;
-                case 's':
-                    stmp = va_arg(ap, char*);
-                    to_pad -= str_len(stmp);
-                    if (pad_reverse)
-                    {
-                        i += sprintf_str(&buf[i], stmp);
-                        while (to_pad-- > 0)
-                            buf[i++] = ' ';
-                    }
-                    else
-                    {
-                        while (to_pad-- > 0)
-                            buf[i++] = ' ';
-                        i += sprintf_str(&buf[i], stmp);
-                    }
-                    break;
-                case 'x':
-                    itmp = va_arg(ap, int32);
-                    to_pad -= get_pad_width(abs(itmp), 16, 0);
-
-                    if (pad_reverse)
-                    {
-                        i += sprintf_hex(&buf[i], itmp);
-                        while (to_pad-- > 0)
-                            buf[i++] = ' ';
-                    }
-                    else
-                    {
-                        while (to_pad-- > 0)
-                            buf[i++] = ' ';
-                        i += sprintf_hex(&buf[i], itmp);
-                    }
-                    break;
-                case 'p':
-                    uitmp = va_arg(ap, uint32);
-                    to_pad -= get_pad_width(uitmp, 16, 0);
-
-                    if (pad_reverse)
-                    {
-                        i += sprintf_hex(&buf[i], uitmp);
-                        while (to_pad-- > 0)
-                            buf[i++] = ' ';
-                    }
-                    else
-                    {
-                        while (to_pad-- > 0)
-                            buf[i++] = ' ';
-                        i += sprintf_hex(&buf[i], uitmp);
-                    }
-                    break;
-                case 'b':
-                    uitmp = va_arg(ap, uint32);
-                    to_pad -= get_pad_width(uitmp, 10, 4);
-
-                    if (pad_reverse)
-                    {
-                        i += sprintf_binary(&buf[i], uitmp);
-                        while (to_pad-- > 0)
-                            buf[i++] = ' ';
-                    }
-                    else
-                    {
-                        while (to_pad-- > 0)
-                            buf[i++] = ' ';
-                        i += sprintf_binary(&buf[i], uitmp);
-                    }
-                    break;
-
                 case '-':
                     pad_reverse = 1;
                     cur ++;
                     goto mod_switch;
+
+                case '%':
+                    buf[i] = '%';
+                    i ++;
+                    break;
+
+                case 'c':
+                    buf[i] = va_arg(ap, char);
+                    i ++;
+                    break;
+
+                case 'd':
+                case 'u':
+                case 's':
+                case 'x':
+                case 'p':
+                case 'b':
+
+                    if ((*cur == 'd') || (*cur == 'x'))
+                        itmp = va_arg(ap, int32);
+                    else if ((*cur == 'u') || (*cur == 'p') || (*cur == 'b'))
+                        uitmp = va_arg(ap, uint32);
+                    else if (*cur == 's')
+                        stmp = va_arg(ap, char*);
+                    else
+                        kpanic("Should not happen (va_arg)");
+
+                    if ((*cur == 'x') || (*cur == 'p'))
+                        to_pad -= get_pad_width(abs(itmp), BASE_HEX, GROUPBY_NONE);
+                    else if ((*cur == 'd') || (*cur == 'u'))
+                        to_pad -= get_pad_width(abs(itmp), BASE_INT, GROUPBY_INT);
+                    else if (*cur == 'b')
+                        to_pad -= get_pad_width(uitmp, BASE_INT, GROUPBY_BIN);
+                    else if (*cur == 's')
+                        to_pad -= str_len(stmp);
+                    else
+                        kpanic("Should not happen (to_pad)");
+
+                    if (!pad_reverse)
+                    {
+                        while (to_pad-- > 0)
+                            buf[i++] = ' ';
+                    }
+
+                    if (*cur == 'd')
+                        i += sprintf_int(&buf[i], itmp);
+                    else if (*cur == 'u')
+                        i += sprintf_uint(&buf[i], uitmp);
+                    else if (*cur == 's')
+                        i += sprintf_str(&buf[i], stmp);
+                    else if (*cur == 'x')
+                        i += sprintf_hex(&buf[i], itmp);
+                    else if (*cur == 'p')
+                        i += sprintf_hex(&buf[i], uitmp);
+                    else if (*cur == 'b')
+                        i += sprintf_binary(&buf[i], uitmp);
+                    else
+                        kpanic("Should not happen (sprintf)");
+
+                    if (pad_reverse)
+                    {
+                        while (to_pad-- > 0)
+                            buf[i++] = ' ';
+                    }
+
+                    break;
 
                 default:
                     if (isdigit(*cur))
