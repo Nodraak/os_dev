@@ -1,11 +1,13 @@
 
-#include "shell.h"
-#include "types.h"
-#include "buffer.h"
-#include "printf.h"
-#include "string.h"
+#include "io/buffer.h"
+#include "io/keyboard.h"
 #include "kmain.h"
-#include "keyboard.h"
+#include "lib/printf.h"
+#include "lib/string.h"
+#include "lib/types.h"
+
+#include "shell/shell.h"
+
 
 s_cmd cmd_data[3];
 uint8 cmd_nb;

@@ -1,11 +1,12 @@
 
-#include "page_frame.h"
-#include "types.h"
-#include "multiboot.h"
-#include "printf.h"
 #include "bitfield.h"
 #include "kmain.h"
-#include "malloc.h"
+#include "lib/malloc.h"
+#include "lib/printf.h"
+#include "lib/types.h"
+#include "x86/multiboot.h"
+
+#include "page_frame.h"
 
 
 void page_frame_init(multiboot_info_t *mbi)

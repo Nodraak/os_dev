@@ -1,10 +1,11 @@
 
-#include "printf.h"
-#include "types.h"
-#include "screen.h"
-#include "buffer.h"
+#include "io/buffer.h"
+#include "io/screen.h"
 #include "kmain.h"
-#include "string.h"
+#include "lib/string.h"
+#include "lib/types.h"
+
+#include "lib/printf.h"
 
 
 void printf(char *format, ...)

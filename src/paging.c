@@ -1,12 +1,13 @@
 
-#include "paging.c.h"
-#include "paging.s.h"
-#include "page_frame.h"
-#include "types.h"
-#include "printf.h"
 #include "kmain.h"
-#include "string.h"
+#include "lib/printf.h"
+#include "lib/string.h"
+#include "lib/types.h"
+#include "page_frame.h"
 #include "task.h"
+#include "x86/paging.s.h"
+
+#include "paging.c.h"
 
 
 void paging_map_frame_virtual_to_phys(void *virt, void *phys)

@@ -1,6 +1,7 @@
 
-#include "buffer.h"
-#include "types.h"
+#include "lib/types.h"
+
+#include "io/buffer.h"
 
 
 void buffer_init(s_buffer *b)

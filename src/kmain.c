@@ -1,21 +1,21 @@
 
-#include "kmain.h"
-
-#include "multiboot.h"
-#include "printf.h"
-#include "screen.h"
-#include "serial.h"
-#include "gdt.h"
-#include "idt.h"
-#include "pic.h"
-#include "keyboard.h"
+#include "descriptor_tables/gdt.h"
+#include "descriptor_tables/idt.h"
+#include "descriptor_tables/pic.h"
+#include "io/buffer.h"
+#include "io/keyboard.h"
+#include "io/screen.h"
+#include "io/serial.h"
+#include "lib/printf.h"
+#include "lib/read_elf.c.h"
 #include "page_frame.h"
 #include "paging.c.h"
-#include "timer.h"
-#include "buffer.h"
-#include "shell.h"
+#include "shell/shell.h"
 #include "task.h"
-#include "read_elf.c.h"
+#include "timer.h"
+#include "x86/multiboot.h"
+
+#include "kmain.h"
 
 
 s_kdata kdata;

@@ -1,7 +1,7 @@
 #ifndef KEYBOARD_H_INCLUDED
 #define KEYBOARD_H_INCLUDED
 
-#include "types.h"
+#include "lib/types.h"
 
 #define KEY_BACKSPACE       0x0E
 

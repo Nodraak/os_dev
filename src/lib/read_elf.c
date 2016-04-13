@@ -1,9 +1,10 @@
 
-#include "types.h"
-#include "printf.h"
 #include "kmain.h"
-#include "multiboot.h"
-#include "read_elf.c.h"
+#include "lib/printf.h"
+#include "lib/types.h"
+#include "x86/multiboot.h"
+
+#include "lib/read_elf.c.h"
 
 
 char *section_header_type_to_str[] = {
@@ -106,13 +107,13 @@ void elf_print_stats(multiboot_elf_section_header_table_t mbi_eshdr)
 }
 
 
-char *resolve_symbol(uint32 addr)
+char *resolve_symbol(void *addr)
 {
     char *ret = NULL;
     uint32 i = 0, closest_symbol = 0;
     elf_symbol *esyhdr = NULL;
 
-    if (add == 0x0)
+    if (addr == 0x0)
         return "<null>";
 
     esyhdr = (elf_symbol*)kdata.symbol_table;
@@ -120,7 +121,7 @@ char *resolve_symbol(uint32 addr)
     for (i = 0; i < kdata.symbol_table_size/EFL_SYMBOL_SIZE; ++i)
     {
         if ((ELF_ST_INFO_TO_TYPE(esyhdr[i].info) == 2) \
-            && (closest_symbol < esyhdr[i].value) && (esyhdr[i].value <= addr)
+            && (closest_symbol < esyhdr[i].value) && (esyhdr[i].value <= (uint32)addr)
         )
         {
             closest_symbol = esyhdr[i].value;

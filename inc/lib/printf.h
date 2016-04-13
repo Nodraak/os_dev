@@ -1,7 +1,7 @@
 #ifndef PRINTF_H_INCLUDED
 #define PRINTF_H_INCLUDED
 
-#include "types.h"
+#include "lib/types.h"
 
 #define __va_rounded_size(TYPE) (((sizeof(TYPE) + sizeof(int) - 1) / sizeof(int)) * sizeof(int))
 #define va_start(AP, ARG) (AP = (char*)&ARG + __va_rounded_size(ARG))

@@ -1,8 +1,8 @@
 #ifndef PAGE_FRAME_H_INCLUDED
 #define PAGE_FRAME_H_INCLUDED
 
-#include "types.h"
-#include "multiboot.h"
+#include "lib/types.h"
+#include "x86/multiboot.h"
 
 #define PAGE_SIZE 0x1000 /* 4 KiB */
 

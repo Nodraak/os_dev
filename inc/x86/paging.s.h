@@ -1,7 +1,7 @@
 #ifndef PAGING_S_H_INCLUDED
 #define PAGING_S_H_INCLUDED
 
-#include "types.h"
+#include "lib/types.h"
 
 uint32 paging_read_cr0(void);
 void paging_write_cr0(uint32 *flags);

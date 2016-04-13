@@ -1,9 +1,10 @@
 
-#include "malloc.h"
-#include "types.h"
-#include "page_frame.h"
 #include "kmain.h"
+#include "lib/types.h"
+#include "page_frame.h"
 #include "paging.c.h"
+
+#include "lib/malloc.h"
 
 
 void *malloc(uint32 size)

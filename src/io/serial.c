@@ -1,8 +1,9 @@
 
-#include "serial.h"
-#include "io.h"
-#include "printf.h"
 #include "kmain.h"
+#include "lib/printf.h"
+#include "x86/io.h"
+
+#include "io/serial.h"
 
 
 void serial_init(void)

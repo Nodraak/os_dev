@@ -1,9 +1,9 @@
 #ifndef KMAIN_H_INCLUDED
 #define KMAIN_H_INCLUDED
 
-#include "buffer.h"
-#include "multiboot.h"
-#include "read_elf.c.h"
+#include "io/buffer.h"
+#include "lib/read_elf.c.h"
+#include "x86/multiboot.h"
 
 typedef struct _s_kdata
 {

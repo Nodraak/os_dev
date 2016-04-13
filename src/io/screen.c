@@ -1,10 +1,11 @@
 
-#include "screen.h"
-#include "types.h"
-#include "serial.h"
-#include "io.h"
+#include "io/serial.h"
 #include "kmain.h"
-#include "printf.h"
+#include "lib/printf.h"
+#include "lib/types.h"
+#include "x86/io.h"
+
+#include "io/screen.h"
 
 
 void screen_init(void)

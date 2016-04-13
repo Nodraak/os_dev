@@ -1,7 +1,7 @@
 #ifndef TASK_H_INCLUDED
 #define TASK_H_INCLUDED
 
-#include "types.h"
+#include "lib/types.h"
 
 #define TASK_MAX    5
 

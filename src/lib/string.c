@@ -1,6 +1,7 @@
 
-#include "string.h"
-#include "types.h"
+#include "lib/types.h"
+
+#include "lib/string.h"
 
 
 uint32 str_len(char *s)

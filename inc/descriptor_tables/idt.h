@@ -1,7 +1,7 @@
 #ifndef IDT_S_H_INCLUDED
 #define IDT_S_H_INCLUDED
 
-#include "types.h"
+#include "lib/types.h"
 
 typedef struct _s_vector
 {

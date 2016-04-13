@@ -1,7 +1,7 @@
 #ifndef BUFFER_H_INCLUDED
 #define BUFFER_H_INCLUDED
 
-#include "types.h"
+#include "lib/types.h"
 
 #define BUFFER_SIZE     1024
 #define EOF             (-1)

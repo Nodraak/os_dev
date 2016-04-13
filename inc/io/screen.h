@@ -1,7 +1,7 @@
 #ifndef SCREEN_H_INCLUDED
 #define SCREEN_H_INCLUDED
 
-#include "types.h"
+#include "lib/types.h"
 
 #define SCREEN_WIDTH    80
 #define SCREEN_HEIGHT   25

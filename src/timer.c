@@ -1,12 +1,14 @@
 
-#include "types.h"
-#include "idt.h"
-#include "screen.h"
-#include "printf.h"
-#include "string.h"
-#include "pic.h"
-#include "io.h"
+#include "descriptor_tables/idt.h"
+#include "descriptor_tables/pic.h"
+#include "io/screen.h"
 #include "kmain.h"
+#include "lib/printf.h"
+#include "lib/string.h"
+#include "lib/types.h"
+#include "x86/io.h"
+
+#include "timer.h"
 
 
 void timer_int_handler(void)

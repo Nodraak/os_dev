@@ -1,10 +1,12 @@
 
-#include "pic.h"
-#include "types.h"
-#include "printf.h"
-#include "idt.h"
-#include "io.h"
-#include "keyboard.h"
+#include "descriptor_tables/idt.h"
+#include "io/keyboard.h"
+#include "lib/printf.h"
+#include "lib/types.h"
+#include "x86/io.h"
+
+#include "descriptor_tables/pic.h"
+
 
 void pic_io_wait(void)
 {

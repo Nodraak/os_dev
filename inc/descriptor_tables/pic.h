@@ -1,8 +1,8 @@
 #ifndef PIC_C_H_INCLUDED
 #define PIC_C_H_INCLUDED
 
-#include "types.h"
-#include "idt.h" /* s_regs */
+#include "descriptor_tables/idt.h" /* s_regs */
+#include "lib/types.h"
 
 #define PIC_MASTER_COMMAND  0x20
 #define PIC_MASTER_DATA     0x21

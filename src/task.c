@@ -1,11 +1,16 @@
 
-#include "task.h"
-#include "types.h"
-#include "malloc.h"
-#include "paging.c.h"
-#include "paging.s.h"
+#include "kmain.h"
+#include "lib/malloc.h"
+#include "lib/printf.h"
+#include "lib/read_elf.c.h"
+#include "lib/types.h"
 #include "page_frame.h"
-#include "printf.h"
+#include "paging.c.h"
+#include "utils.c.h"
+#include "utils.s.h"
+#include "x86/paging.s.h"
+
+#include "task.h"
 
 
 s_task tasks[TASK_MAX];

@@ -1,8 +1,8 @@
 #ifndef READ_ELF_C_H_INCLUDED
 #define READ_ELF_C_H_INCLUDED
 
-#include "types.h"
-#include "multiboot.h"
+#include "lib/types.h"
+#include "x86/multiboot.h"
 
 /* The ELF file header.  This appears at the start of every ELF file.  */
 
@@ -108,6 +108,6 @@ typedef struct _elf_program_header {
 /* Prototypes. */
 
 void elf_print_stats(multiboot_elf_section_header_table_t mbi_eshdr);
-char *resolve_symbol(uint32 addr);
+char *resolve_symbol(void *addr);
 
 #endif

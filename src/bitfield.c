@@ -1,6 +1,8 @@
 
+#include "lib/types.h"
+
 #include "bitfield.h"
-#include "types.h"
+
 
 uint8 bitfield_get(uint8 bitfield, uint8 id)
 {

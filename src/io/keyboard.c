@@ -1,10 +1,12 @@
 
-#include "keyboard.h"
-#include "io.h"
-#include "printf.h"
-#include "pic.h"
-#include "buffer.h"
+#include "descriptor_tables/pic.h"
+#include "io/buffer.h"
 #include "kmain.h"
+#include "lib/printf.h"
+#include "x86/io.h"
+
+#include "io/keyboard.h"
+
 
 void kb_int_handler_install(void)
 {

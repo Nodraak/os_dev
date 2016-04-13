@@ -1,7 +1,7 @@
 #ifndef SERIAL_H_INCLUDED
 #define SERIAL_H_INCLUDED
 
-#include "types.h"
+#include "lib/types.h"
 
 void serial_init(void);
 
