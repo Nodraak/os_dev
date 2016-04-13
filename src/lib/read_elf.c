@@ -113,7 +113,7 @@ char *resolve_symbol(void *addr)
     uint32 i = 0, closest_symbol = 0;
     elf_symbol *esyhdr = NULL;
 
-    if (addr == 0x0)
+    if (addr == NULL)
         return "<null>";
 
     esyhdr = (elf_symbol*)kdata.symbol_table;

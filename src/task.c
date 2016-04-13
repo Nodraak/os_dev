@@ -1,4 +1,5 @@
 
+#include "debug.h"
 #include "kmain.h"
 #include "lib/malloc.h"
 #include "lib/printf.h"
@@ -6,8 +7,6 @@
 #include "lib/types.h"
 #include "page_frame.h"
 #include "paging.c.h"
-#include "utils.c.h"
-#include "utils.s.h"
 #include "x86/paging.s.h"
 
 #include "task.h"
