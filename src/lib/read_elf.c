@@ -109,19 +109,18 @@ void elf_print_stats(multiboot_elf_section_header_table_t mbi_eshdr)
 
 char *resolve_symbol(void *addr)
 {
-    char *ret = NULL;
     uint32 i = 0, closest_symbol = 0;
-    elf_symbol *esyhdr = NULL;
+    char *ret = "<null>";
+    elf_symbol *esyhdr = (elf_symbol*)kdata.symbol_table;
 
     if (addr == NULL)
-        return "<null>";
-
-    esyhdr = (elf_symbol*)kdata.symbol_table;
+        return ret;
 
     for (i = 0; i < kdata.symbol_table_size/EFL_SYMBOL_SIZE; ++i)
     {
-        if ((ELF_ST_INFO_TO_TYPE(esyhdr[i].info) == 2) \
-            && (closest_symbol < esyhdr[i].value) && (esyhdr[i].value <= (uint32)addr)
+        if ((ELF_ST_INFO_TO_TYPE(esyhdr[i].info) == 2)
+            && (closest_symbol < esyhdr[i].value)
+            && (esyhdr[i].value <= (uint32)addr) && ((uint32)addr < esyhdr[i].value+esyhdr[i].size)
         )
         {
             closest_symbol = esyhdr[i].value;

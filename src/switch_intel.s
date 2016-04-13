@@ -1,15 +1,31 @@
 
 global tasking_switch
 
+extern task_running
 
 ; Regs saved/restored (cf task.h): eax, ebx, ecx, edx, esi, edi, esp, ebp, eip, eflags, cr3
 tasking_switch:
     push ebp
     mov ebp, esp
 
+    sub esp, 0x8 ; [ebp-4] = old ; [ebp-8] = new
+
+    push eax
+    ; [ebp-4] = &old->regs
+    mov eax, [task_running]
+    mov [ebp-4], eax
+    ; old = old->next
+    mov eax, [task_running]
+    mov eax, [eax+44]
+    mov [task_running], eax
+    ; [ebp-8] = &old->regs
+    mov eax, [task_running]
+    mov [ebp-8], eax
+    pop eax
+
     ; save all regs to the old thread data struct
     push eax ; save eax
-    mov eax, [ebp+8] ; use eax as ptr
+    mov eax, [ebp-4] ; use eax as ptr
     mov [eax+4], ebx
     mov [eax+8], ecx
     mov [eax+12], edx
@@ -29,7 +45,7 @@ tasking_switch:
     mov [eax+0], ebx
 
     ; load all regs from the new thread data struct
-    mov eax, [ebp+12] ; use eax as ptr
+    mov eax, [ebp-8] ; use eax as ptr
     mov ecx, [eax+8]
     mov edx, [eax+12]
     mov esi, [eax+16]
@@ -45,7 +61,7 @@ tasking_switch:
     mov cr3, ebx
     ; restore eax and ebx
     mov ebx, [eax+4]
-    mov eax, [eax]
+    mov eax, [eax+0]
 
     add esp, 4 ; remove junk (old ebp)
 

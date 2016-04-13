@@ -24,8 +24,8 @@ void func1(void)
     while (1)
     {
         printf("in task 1.1\n");
-        tasking_preempt();
         printf("in task 1.2\n");
+        tasking_switch();
     }
 }
 
@@ -34,7 +34,7 @@ void func2(void)
     while (1)
     {
         printf("in task 2.1\n");
-        tasking_preempt();
+        tasking_switch();
         printf("in task 2.2\n");
     }
 }
@@ -44,7 +44,7 @@ void func3(void)
     while (1)
     {
         printf("in task 3.1\n");
-        tasking_preempt();
+        tasking_switch();
         printf("in task 3.2\n");
     }
 }
@@ -79,16 +79,11 @@ void tasking_create(s_task *task, void(*func)(void), s_task *next)
     task->regs.cr3 = (uint32)task_pagedir;
     task->regs.ebp = (uint32)malloc(PAGE_SIZE) + PAGE_SIZE/2; // todo check that
     task->regs.esp = task->regs.ebp;
+    printf("create task, task.esp=%x=%d\n", task->regs.esp, task->regs.esp);
     task->next = next;
-}
 
-void tasking_preempt(void)
-{
-    s_task *old = NULL;
-
-    printf("preempt -> from %d to %d\n", (int)(task_running-(&tasks[0])+1), (int)(task_running->next-(&tasks[0])+1));
-
-    old = task_running;
-    task_running = task_running->next;
-    tasking_switch(&old->regs, &task_running->regs);
+    void *addr = (void*)(task->regs.eip/PAGE_SIZE*PAGE_SIZE);
+    paging_map_frame_virtual_to_phys(addr, addr); // todo check that
+    addr = (void*)(task->regs.ebp/PAGE_SIZE*PAGE_SIZE);
+    paging_map_frame_virtual_to_phys(addr, addr); // todo check that
 }

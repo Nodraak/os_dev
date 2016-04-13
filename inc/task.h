@@ -14,12 +14,11 @@ typedef struct _s_task
 {
     s_registers regs;
     struct _s_task *next;
-} s_task;
+} __attribute__((packed)) s_task;
 
 void tasking_init(void);
 void tasking_create(s_task *task, void(*func)(void), s_task *next);
-void tasking_preempt(void); /* Switch task frontend */
-void tasking_switch(s_registers *old, s_registers *new); /* The ASM function which actually switches */
+void tasking_switch(void);
 
 
 #endif
