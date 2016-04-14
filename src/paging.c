@@ -41,10 +41,10 @@ void paging_map_frame_virtual_to_phys(void *virt, void *phys)
 
     uint32 *page_table = (uint32*)(kdata.page_directory[pd_id] & 0xFFFFF000);
 
-    if (page_table[pt_id] & PF_FLAG_PRESENT)
+    if ((page_table[pt_id] & PF_FLAG_PRESENT) && ((page_table[pt_id] & 0xFFFFF000) != (uint32)phys))
     {
-        printf("\tWarning : page_table_entry already mapped to %x (overwritting with %x)\n",
-            page_table[pt_id] & 0xFFFFF000, (uint32)phys);
+        printf("\tWarning: page %p already mapped to %x (overwritting with %p)\n",
+            virt, page_table[pt_id] & 0xFFFFF000, phys);
     }
 
     page_table[pt_id] = (uint32)phys | PF_FLAG_BASE | PF_FLAG_PRESENT;

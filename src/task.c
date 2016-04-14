@@ -21,11 +21,14 @@ uint32 *task_pagedir;
 
 void func1(void)
 {
-    while (1)
+    int i = 0;
+    for (i = 0; i < 3; ++i)
     {
-        printf("in task 1.1\n");
-        printf("in task 1.2\n");
+        printf("in task 1.1 - %d\n", i);
+        print_stack_trace();
         tasking_switch();
+        printf("in task 1.2 - %d\n", i);
+        print_stack_trace();
     }
 }
 
@@ -34,8 +37,10 @@ void func2(void)
     while (1)
     {
         printf("in task 2.1\n");
+        print_stack_trace();
         tasking_switch();
         printf("in task 2.2\n");
+        print_stack_trace();
     }
 }
 
@@ -44,8 +49,10 @@ void func3(void)
     while (1)
     {
         printf("in task 3.1\n");
+        print_stack_trace();
         tasking_switch();
         printf("in task 3.2\n");
+        print_stack_trace();
     }
 }
 
@@ -53,7 +60,7 @@ void tasking_init(void)
 {
     /* Get EFLAGS and CR3 */
     task_pagedir = paging_read_cr3();
-    asm volatile("pushfl; movl (%%esp), %%eax; movl %%eax, %0; popfl;":"=m"(task_flag)::"%eax");
+    task_flag = tasking_read_flags();
 
     printf("pagedir=%p flags=%d\n", task_pagedir, task_flag);
 
@@ -68,6 +75,8 @@ void tasking_init(void)
 
 void tasking_create(s_task *task, void(*func)(void), s_task *next)
 {
+    printf("[Tasking] Create task with callback=%p\n", func);
+
     task->regs.eax = 0;
     task->regs.ebx = 0;
     task->regs.ecx = 0;
@@ -79,11 +88,9 @@ void tasking_create(s_task *task, void(*func)(void), s_task *next)
     task->regs.cr3 = (uint32)task_pagedir;
     task->regs.ebp = (uint32)malloc(PAGE_SIZE) + PAGE_SIZE/2; // todo check that
     task->regs.esp = task->regs.ebp;
-    printf("create task, task.esp=%x=%d\n", task->regs.esp, task->regs.esp);
+
     task->next = next;
 
     void *addr = (void*)(task->regs.eip/PAGE_SIZE*PAGE_SIZE);
-    paging_map_frame_virtual_to_phys(addr, addr); // todo check that
-    addr = (void*)(task->regs.ebp/PAGE_SIZE*PAGE_SIZE);
-    paging_map_frame_virtual_to_phys(addr, addr); // todo check that
+    paging_map_frame_virtual_to_phys(addr, addr);
 }

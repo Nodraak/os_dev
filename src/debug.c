@@ -22,21 +22,22 @@ void print_regs(s_registers *regs)
 }
 
 
-void _print_stack_trace(void *ebp)
+void _print_stack_trace(void *ebp, void *eip)
 {
     int i = 0;
-    void *eip = NULL;
+    char *ptr = NULL;
 
     printf("Stack trace\n");
-    for (i = 0; i < 5; ++i)
+    printf("\t%p %s\n", eip, resolve_symbol(eip));
+
+    while (ebp)
     {
         eip = (void*)((uint32*)ebp)[1];
-        printf("\t%p %s\n", eip, resolve_symbol(eip));
-        ebp = (void*)*(uint32*)ebp;
-        if (ebp == NULL)
-        {
-            printf("\t(End of stack)\n");
+        ptr = resolve_symbol(eip);
+        if (ptr == NULL)
             break;
-        }
+        printf("\t%p %s\n", eip, ptr);
+        ebp = (void*)*(uint32*)ebp;
     }
+    printf("\t(End of stack)\n");
 }

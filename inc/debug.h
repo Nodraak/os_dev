@@ -9,6 +9,6 @@ void print_stack_trace(void);
 
 // .c
 void print_regs(s_registers *regs);
-void _print_stack_trace(void *ebp);
+void _print_stack_trace(void *ebp, void *eip);
 
 #endif

@@ -2,12 +2,13 @@
 
 global paging_read_cr0
 global paging_write_cr0
+global paging_read_cr2
 global paging_read_cr3
 global paging_write_cr3
 global paging_reload_page_directory
 
-; cr0 : flags. The big 31 enable paging
-; cr3 : address of page directory
+; cr0: flags. The big 31 enable paging
+; cr3: address of page directory
 
 paging_read_cr0:
     mov eax, cr0
@@ -19,6 +20,10 @@ paging_write_cr0:
     mov eax, [ebp+8]
     mov cr0,  eax
     leave ; leave == mov esp, ebp + pop ebp
+    ret
+
+paging_read_cr2:
+    mov eax, cr3
     ret
 
 paging_read_cr3:

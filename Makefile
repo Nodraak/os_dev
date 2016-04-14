@@ -4,9 +4,9 @@ SUBDIR = descriptor_tables io lib x86 shell
 _OBJECTS_DT = gdt.s.o idt.s.o pic.c.o
 _OBJECTS_IO = buffer.c.o keyboard.c.o screen.c.o serial.c.o
 _OBJECTS_LIB = printf.c.o string.c.o malloc.c.o read_elf.c.o
-_OBJECTS_X86 = boot.s.o io.s.o paging.s.o
+_OBJECTS_X86 = boot.s.o io.s.o paging.s.o tasking_switch.s.o
 _OBJECTS_SHELL = shell.c.o
-_OBJECTS_MAIN = kmain.c.o timer.c.o page_frame.c.o bitfield.c.o task.c.o switch_intel.s.o paging.c.o debug.s.o debug.c.o
+_OBJECTS_MAIN = kmain.c.o timer.c.o page_frame.c.o bitfield.c.o task.c.o paging.c.o debug.s.o debug.c.o
 
 _OBJECTS = $(addprefix descriptor_tables/, $(_OBJECTS_DT)) \
 	 $(addprefix io/, $(_OBJECTS_IO)) \

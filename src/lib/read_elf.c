@@ -110,7 +110,7 @@ void elf_print_stats(multiboot_elf_section_header_table_t mbi_eshdr)
 char *resolve_symbol(void *addr)
 {
     uint32 i = 0, closest_symbol = 0;
-    char *ret = "<null>";
+    char *ret = NULL;
     elf_symbol *esyhdr = (elf_symbol*)kdata.symbol_table;
 
     if (addr == NULL)

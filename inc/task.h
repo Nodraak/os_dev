@@ -18,7 +18,8 @@ typedef struct _s_task
 
 void tasking_init(void);
 void tasking_create(s_task *task, void(*func)(void), s_task *next);
-void tasking_switch(void);
+uint32 tasking_read_flags(void); // asm
+void tasking_switch(void); // asm
 
 
 #endif

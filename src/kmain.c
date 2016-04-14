@@ -46,6 +46,8 @@ void kinit(multiboot_info_t *mbi)
     pic_remap();
     kb_int_handler_install();
 
+    int_handler_install(handler, 0xE); // Page Fault
+
     /* memory */
     page_frame_init(mbi);
     paging_init();

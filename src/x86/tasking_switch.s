@@ -1,31 +1,23 @@
-
-global tasking_switch
+[BITS 32]
 
 extern task_running
+
+global tasking_read_flags
+global tasking_switch
+
+tasking_read_flags:
+    pushf
+    pop eax
+    ret
 
 ; Regs saved/restored (cf task.h): eax, ebx, ecx, edx, esi, edi, esp, ebp, eip, eflags, cr3
 tasking_switch:
     push ebp
     mov ebp, esp
 
-    sub esp, 0x8 ; [ebp-4] = old ; [ebp-8] = new
-
-    push eax
-    ; [ebp-4] = &old->regs
-    mov eax, [task_running]
-    mov [ebp-4], eax
-    ; old = old->next
-    mov eax, [task_running]
-    mov eax, [eax+44]
-    mov [task_running], eax
-    ; [ebp-8] = &old->regs
-    mov eax, [task_running]
-    mov [ebp-8], eax
-    pop eax
-
     ; save all regs to the old thread data struct
     push eax ; save eax
-    mov eax, [ebp-4] ; use eax as ptr
+    mov eax, [task_running]
     mov [eax+4], ebx
     mov [eax+8], ecx
     mov [eax+12], edx
@@ -41,28 +33,31 @@ tasking_switch:
     mov [eax+36], ebx
     mov ebx, cr3 ; cr3
     mov [eax+40], ebx
-    pop ebx ; eax
+    pop ebx ; get eax
     mov [eax+0], ebx
 
+    ; get the next task
+    mov eax, [task_running]
+    mov eax, [eax+44]
+    mov [task_running], eax
+
     ; load all regs from the new thread data struct
-    mov eax, [ebp-8] ; use eax as ptr
+    mov eax, [task_running]
     mov ecx, [eax+8]
     mov edx, [eax+12]
     mov esi, [eax+16]
     mov edi, [eax+20]
     mov esp, [eax+24] ; esp
     mov ebp, [eax+28] ; ebp
-    mov ebx, [eax+32] ; eip
-    mov [ebp+4], ebx
-    mov ebx, [eax+36] ; eflags
+    mov ebx, [eax+36] ; eflags - changes stack
     push ebx
     popf
-    mov ebx, [eax+40]
+    mov ebx, [eax+40] ; cr3
     mov cr3, ebx
-    ; restore eax and ebx
+    mov ebx, [eax+32] ; eip - require intact stack
+    mov [esp-4], ebx
+    ; eax and ebx
     mov ebx, [eax+4]
     mov eax, [eax+0]
 
-    add esp, 4 ; remove junk (old ebp)
-
-    ret
+    jmp [esp-4]
